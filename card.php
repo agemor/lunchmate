@@ -4,8 +4,11 @@
 
   <h6 class="card-subtitle text-muted">공과대학</h6>
 <hr>
-  <p class="card-text">이 사이트의 개발자입니다. 프로그래밍, 피아노 치기에 관심이 많아요!</p>
+  <p>이 사이트의 개발자입니다. 프로그래밍, 피아노 치기에 관심이 많아요! ㅂㄷㅎㅂㄷㅎ
+  ㅂㄷㅎ
+  ㅂㄷㅎㅂ
+  ㄷㅎㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ</p>
   <button type="button" class="btn btn-sm btn-outline-secondary">+ 관심</button>
-  <button type="button" class="btn btn-sm btn-outline-info">요청 보내기</button>
+  <button type="button" class="btn btn-sm btn-outline-info">안녕하세요</button>
 
 </div>    

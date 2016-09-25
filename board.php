@@ -27,14 +27,14 @@
 
 
 
-<div class="input-group input-group-lg " style="margin-top: 15px; margin-bottom: 15px">
+<div class="input-group input-group-lg m-y-2">
       <input type="text" class="form-control" placeholder="검색 키워드">
       <span class="input-group-btn">
         <button class="btn btn-secondary" type="button">찾기</button>
       </span>
     </div>
 
-<div class="alert alert-info alert-dismissible fade in" style="margin-top: 15px;"" role="alert">
+<div class="alert alert-info alert-dismissible fade in" role="alert">
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
