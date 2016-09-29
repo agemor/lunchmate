@@ -19,7 +19,7 @@ td * { display: inline; }
       </style>
       <div class="container m-y-2">
       <div class="row">
-        <div class="col-md-6">
+        <div class="col-lg-6">
           <div class="list-group m-b-3">
             <a href="#" class="list-group-item list-group-item-action">
               <p class="list-group-item-heading">
@@ -41,7 +41,7 @@ td * { display: inline; }
             </a>
           </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-lg-6">
 
 <div class="card">
   <div class="card-block">
