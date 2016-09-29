@@ -41,6 +41,11 @@
   <strong>Lunchmate에 처음이신가요?</strong> 여기서 서비스 이용에 관한 사항을 숙지하세요.
 </div>
 
+
+          <?php include "request-modal.php";?>
+
+
+
   <div class="row">
     <div class="col-sm-6 col-md-4 col-lg-3">
           <?php include "card-me.php";?>

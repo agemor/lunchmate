@@ -6,10 +6,10 @@
     <div class="container">
       <ul class="nav navbar-nav">
         <li class="nav-item active">
-          <a class="nav-link" href="board.php">사람들 <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="peoples.php">사람들 <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="request.php">요청 현황</a>
+          <a class="nav-link" href="requests.php">요청 현황</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="profile.php">내 프로필</a>

@@ -9,6 +9,6 @@
   ㅂㄷㅎㅂ
   ㄷㅎㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇㅇ</p>
   <button type="button" class="btn btn-sm btn-outline-secondary">+ 관심</button>
-  <button type="button" class="btn btn-sm btn-outline-info">안녕하세요</button>
+  <button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#myModal">안녕하세요</button>
 
 </div>    

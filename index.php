@@ -6,5 +6,5 @@
 2. 4시까지 db 스케마 짜기
 
 */
-include "board.php";
+include "peoples.php";
 ?>
