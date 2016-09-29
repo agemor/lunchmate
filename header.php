@@ -22,8 +22,6 @@
   </div>
 </nav>
 
-
-
 <div class="collapse bg-faded" id="loginCollapsePanel">
 
   <div class=" p-a-3">
@@ -31,12 +29,12 @@
     <div class=" container ">
       <h4>연세포탈 로그인</h4>
       <h6 class="text-muted">별도의 회원가입 과정 없이 포탈 로그인으로 이용이 가능합니다. <a href="#" style="color:grey">추가 정보</a></h6>
-      <form class="form-inline" style="margin-top: 30px">
+      <form class="form-inline" action="signin.php" method="post" style="margin-top: 30px">
         <div class="form-group">
-          <input type="number" class="form-control" id="studentId" placeholder="학번" required>
+          <input type="number" class="form-control" id="studentId" name="student-id" placeholder="학번" required>
         </div>
         <div class="form-group">
-          <input type="password" class="form-control" id="studentPassword" placeholder="비밀번호" required>
+          <input type="password" class="form-control" id="studentPassword" name="student-password" placeholder="비밀번호" required>
         </div>
         <button type="submit" class="btn btn-secondary">로그인</button>
       </form>
