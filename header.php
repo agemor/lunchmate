@@ -15,7 +15,15 @@
           <a class="nav-link" href="profile.php">내 프로필</a>
         </li>
         <li class="nav-item pull-xs-right">
-          <a class="nav-link" href="#" data-toggle="collapse" data-target="#loginCollapsePanel" aria-controls="loginCollapsePanel" aria-expanded="false" aria-label="Toggle navigation" id="loginToggleButton">로그인</a>
+          <?php
+            if (!assigned()) {
+                echo '<a class="nav-link" href="#" data-toggle="collapse" data-target="#loginCollapsePanel" aria-controls="loginCollapsePanel" aria-expanded="false" aria-label="Toggle navigation" id="loginToggleButton">로그인</a>';
+            } else {
+                echo '<a class="nav-link" href="signout.php">로그아웃</a>';
+            }
+          ?>
+
+          
         </li>
       </ul>
     </div>
@@ -24,11 +32,11 @@
 
 <div class="collapse bg-faded" id="loginCollapsePanel">
 
-  <div class=" p-a-3">
+  <div class="p-a-3">
 
     <div class=" container ">
       <h4>연세포탈 로그인</h4>
-      <h6 class="text-muted">별도의 회원가입 과정 없이 포탈 로그인으로 이용이 가능합니다. <a href="#" style="color:grey">추가 정보</a></h6>
+      <h6 class="text-muted">별도의 회원가입 과정 없이 포탈 로그인으로 안전한 이용이 가능합니다. <a href="#" style="color:grey"><u>추가 정보</u></a></h6>
       <form class="form-inline" action="signin.php" method="post" style="margin-top: 30px">
         <div class="form-group">
           <input type="number" class="form-control" id="studentId" name="student-id" placeholder="학번" required>
