@@ -47,12 +47,10 @@ global $conn;
 
     if ($result->num_rows > 0) {
 
-        $returnResult = array($result->num_rows);
-        $i = 0;
+        $returnResult = array();
         // output data of each row
         while($row = $result->fetch_assoc()) {
-
-            $returnResult[$i++] = $row;
+            array_push($returnResult, $row);
 
             //echo "id: " . $row["id"]. " - Name: " . $row["firstname"]. " " . $row["lastname"]. "<br>";
         }
