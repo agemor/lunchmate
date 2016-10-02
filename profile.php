@@ -26,7 +26,7 @@ if (isset($_POST["setting-type"])) {
 
   // 소개
   else {
-    $content = $_POST["profile-content"];
+    $content = strip_tags($_POST["profile-content"]);
     if (mb_strlen($content, 'utf-8') > 210) {
       $success = false;
       $message = "프로필 소개글의 글자 수 제한을 초과하였습니다.";
@@ -179,8 +179,6 @@ $response = askOne("SELECT * FROM `lunchmate`.`lunchmate_users` WHERE `student_i
         countText();
         $('#profileMessage').keyup(countText);
 
-
-        
       </script>
     </main>
     <footer>
