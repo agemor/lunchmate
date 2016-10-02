@@ -5,15 +5,17 @@
   <div class="collapse navbar-toggleable-xs" id="navigationBar">
     <div class="container">
       <ul class="nav navbar-nav">
-        <li class="nav-item active">
+        <li class="nav-item <?php if($location == "peoples.php") { echo("active"); }?>">
           <a class="nav-link" href="peoples.php">사람들 <span class="sr-only">(current)</span></a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="requests.php">요청 현황</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="profile.php">내 프로필</a>
-        </li>
+
+        <?php
+        if (assigned()) {
+          echo '<li class="nav-item '.($location == "requests.php" ? "active" : "" ).'"><a class="nav-link" href="requests.php">요청 현황</a></li>';
+          echo '<li class="nav-item '.($location == "profile.php" ? "active" : "" ).'"><a class="nav-link" href="profile.php">내 프로필</a></li>';
+        }
+        ?>
+        
         <li class="nav-item pull-xs-right">
           <?php
             if (!assigned()) {

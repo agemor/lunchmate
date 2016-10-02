@@ -11,6 +11,10 @@ function release() {
 	session_destroy();
 }
 
+function getUserId() {
+	return $_SESSION['user_id'];
+}
+
 function assigned() {
 	return isset($_SESSION['assigned']) && $_SESSION['assigned'] == true;
 }

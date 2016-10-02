@@ -1,9 +1,9 @@
 <?php
-
 include "session.php";
 
-?>
+$location = "peoples.php";
 
+?>
 
 <!DOCTYPE html>
 <html lang="ko">

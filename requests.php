@@ -2,6 +2,8 @@
 
 include "session.php";
 
+$location = "requests.php";
+
 ?>
 
 
