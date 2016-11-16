@@ -4,13 +4,13 @@ include "session.php";
 
 $location = "peoples.php";
 
-$response = ask("SELECT * FROM `lunchmate`.`lunchmate_users` ORDER BY RAND() LIMIT 20;");
+$response = ask("SELECT * FROM `lunchmate_users` ORDER BY RAND() LIMIT 20;");
 
 // 내 프로필
 $mesponse;
 
 if(assigned()) {
-  $mesponse = askOne("SELECT * FROM `lunchmate`.`lunchmate_users` WHERE `student_id`='".getUserId()."';");
+  $mesponse = askOne("SELECT * FROM `lunchmate_users` WHERE `student_id`='".getUserId()."';");
 }
 
 /**

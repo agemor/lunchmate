@@ -39,12 +39,12 @@
     <div class=" container ">
       <h4>연세포탈 로그인</h4>
       <h6 class="text-muted">별도의 회원가입 과정 없이 포탈 로그인으로 안전한 이용이 가능합니다. <a href="#" style="color:grey"><u>추가 정보</u></a></h6>
-      <form class="form-inline" action="signin.php" method="post" style="margin-top: 30px">
+      <form class="form-inline" action="https://www.lunchmate.co.kr:5007/signin.php" method="post" style="margin-top: 30px">
         <div class="form-group">
-          <input type="number" class="form-control" id="studentId" name="student-id" placeholder="학번" required>
+          <input type="number" class="form-control" id="studentId" name="user-id" placeholder="학번" required>
         </div>
         <div class="form-group">
-          <input type="password" class="form-control" id="studentPassword" name="student-password" placeholder="비밀번호" required>
+          <input type="password" class="form-control" id="studentPassword" name="user-password" placeholder="비밀번호" required>
         </div>
         <button type="submit" class="btn btn-secondary">로그인</button>
       </form>

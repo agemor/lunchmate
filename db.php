@@ -1,9 +1,9 @@
 <?php
 
-const SERVER_NAME = "localhost";
-const USER_NAME = "root";
-const USER_PASSWORD = "asd123";
-const DB_NAME = "lunchmate";
+const SERVER_NAME = "db.lunchmate.co.kr";
+const USER_NAME = "lunchmate";
+const USER_PASSWORD = "lunchmateadmin16";
+const DB_NAME = "dblunchmate";
 
 // Create connection
 $conn = new mysqli(SERVER_NAME, USER_NAME, USER_PASSWORD, DB_NAME);
@@ -13,8 +13,6 @@ if ($conn->connect_error) {
 } 
 
 /*
-
-
 
 $sql = "INSERT INTO MyGuests (firstname, lastname, email)
 VALUES ('John', 'Doe', 'john@example.com')";
@@ -44,7 +42,6 @@ function ask($sql) {
 global $conn;
 
     $result = $conn->query($sql);
-
     if ($result->num_rows > 0) {
 
         $returnResult = array();

@@ -1,97 +1,78 @@
 <?php
-include "db.php";
 include "session.php";
+include "module.db.php";
+include "module.yonsei.php";
 
-/*
- * 연세포탈 로그인 인증 수행 모듈
- */
-const YONSEI_LOGIN_URL = 'https://infra.yonsei.ac.kr/lauth/YLLOGIN.do';
-const YONSEI_WACTION = 'aW50bHBvcnRhbA==';
-const YONSEI_SCODE = 'bm9lbmNyeXB0';
+const HOST = "http://www.lunchmate.co.kr/";
 
-function getYonseiAuth($id, $password) {
-    
-    $data = array(
-        'id' => $id,
-        'pw' => $password,
-        'waction' => YONSEI_WACTION,
-        'sCode' => YONSEI_SCODE,
-        'returl' => 'verification.php'
-    );
-    
-    $options = array(
-        'http' => array(
-            'header' => "Content-type: application/x-www-form-urlencoded\r\n",
-            'method' => 'POST',
-            'content' => http_build_query($data)
-        )
-    );
-    $context = stream_context_create($options);
-    $result  = htmlspecialchars(file_get_contents(YONSEI_LOGIN_URL, false, $context));
-    
-    if ($result === FALSE || strlen($result) < 20 || empty($result)) {
-        return array();
-    } else {
+/* 전송된 데이터 래핑 */
+$userId = stripslashes($_POST["user-id"]);
+$userPassword = $_POST["user-password"];
 
-        $raw = explode("'", explode("gubun5' value='", $result)[1])[0];
-        $decoded = urldecode(base64_decode($raw));
-        $chunk = explode("|", $decoded);
+/* 연세포탈 로그인 시도 */
+$yonseiAccount = $module->yonsei->signin($userId, $userPassword);
 
-        $nameKorean = $chunk[1];
-        $nameEnglish = $chunk[2];
-        $phoneNumber = $chunk[3];
+/* 로그인 실패 */
+if (count($yonseiAccount) < 1) {
 
-        //echo "국문: ".$nameKorean. "<br/>";
-        //echo "영문: ".$nameEnglish. "<br/>";
-        //echo "번호: ".$phoneNumber. "<br/>";
-        return array($nameKorean, $nameEnglish, $phoneNumber);
-    }
-}
-
-$userId = stripslashes($_POST["student-id"]);
-$userPassword = $_POST["student-password"];
-//$location = isset($_POST["page-location"]) ? $_POST["page-location"] : "/";
-
-$authResult = getYonseiAuth($userId, $userPassword);
-
-if (count($authResult) < 1) {
-    header('Location: /?fail');
+    // 실패 페이지로 이동
+    header('Location: '.HOST.'?signin-fail');
     exit();
 }
 
-$response = askOne("SELECT `student_id` FROM `lunchmate`.`lunchmate_users` WHERE `student_id`='".$userId."';");
+// 계정 조회
+//$query = "SELECT `student_id` FROM `lunchmate_users` WHERE `student_id`='".$yonseiAccount["id"]."';";
+// $response = $module->db->goAndGet($query);
 
-// 이미 있는 계정
-if ($response != null) {
+$response = $module->db->in('lunchmate_users')
+                       ->select('student_id')
+                       ->where('student_id', '=', $yonseiAccount["id"])
+                       ->goAndGet();
 
-    // 정보 업데이트
-    if (strlen($authResult[2]) > 5) {
-        $success = tell("UPDATE `lunchmate`.`lunchmate_users` SET  `phone_number`='".$authResult[2]."' WHERE `student_id`='".$userId."';");
-    } else {
-        $success = true;
-    }
 
-    if ($success) {
-        header('Location: /?success');
-    } else {
-        header('Location: /?success-noupdate');
-    }
+// 이미 존재하는 계정
+if ($response) {
 
-    assign($userId);
+    // 연락처 업데이트
+    //$query = "UPDATE `lunchmate_users` SET  `phone_number`='".$yonseiAccount["phone"]."' WHERE `student_id`='".$yonseiAccount["id"]."';";
+    //$response = $module->db->go($query);
+    $response = $module->db->in('lunchmate_users')
+                           ->update('phone_number', $yonseiAccount["phone"])
+                           ->where('student_id', '=', $yonseiAccount["id"])
+                           ->go();
 
+    // 세션 등록
+    assign($yonseiAccount["id"]);
+
+    // 성공 페이지로 이동
+    header('Location: '.HOST.'?signin-success');
     exit();
 } 
 
-// 없는 계정
+// 새로운 계정
 else {
+
     // 계정 생성
-    $success = tell("INSERT INTO `lunchmate`.`lunchmate_users` (student_id, name_korean, name_english, phone_number) VALUES ('".$userId ."', '".base64_encode($authResult[0])."', '".$authResult[1]."', '".$authResult[2]."')");
-    if ($success) {
-        header('Location: /?new');
-        exit();
-    } else {
-        header('Location: /?new-fail');
-        exit();
+    //$query = "INSERT INTO `lunchmate_users` (student_id, name_korean, name_english, phone_number) VALUES ('"
+    //        .$yonseiAccount["id"] ."', '".base64_encode($yonseiAccount["korean"])."', '".$yonseiAccount["english"]."', '".$yonseiAccount["phone"]."')";
+    //$response = $module->db->go($query);
+
+    $response = $module->db->in('lunchmate_users')
+                           ->insert('student_id', $yonseiAccount["id"])
+                           ->insert('name_korean', base64_encode($yonseiAccount["korean"])))
+                           ->insert('name_english', $yonseiAccount["english"])
+                           ->insert('phone_number', $yonseiAccount["phone"])
+                           ->go();
+
+    // 회원가입 성공
+    if ($response) {
+        header('Location: '.HOST.'?signup-success'); 
     }
+
+    // 회원가입 실패
+    else {
+        header('Location: '.HOST.'?signup-fail');
+    }
+    exit();
 }
 ?>
