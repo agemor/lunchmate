@@ -63,7 +63,7 @@ $module->{"db"} = new class {
     }
 
     /* 다중 응답 반환이 필요한 쿼리문을 수행한다 */
-    public function goAndGet() {
+    public function goAndGetAll() {
 
         // 연결 상태 테스트
         if (!$this->connected) {
@@ -93,7 +93,7 @@ $module->{"db"} = new class {
     }
 
     /* 단일 응답 반환이 필요한 쿼리문을 수행한다 */
-    public function goAndGetAll() {
+    public function goAndGet() {
 
         // 연결 상태 테스트
         if (!$this->connected) {
@@ -179,10 +179,13 @@ $module->{"db"} = new class {
 
         // SELECT 문일 경우
         if ($this->queryBlocks["type"] == "select") {
-            //$query = "SELECT `student_id` FROM `lunchmate_users` WHERE `student_id`='".$yonseiAccount["id"]."';";
             $query .= "SELECT ";
             foreach($this->queryBlocks["target"] as $target) {
-                $query .= "`".$this->escape($target)."`,";
+                if ($target == "*") {
+                    $query .= "*,";
+                } else {
+                    $query .= "`".$this->escape($target)."`,";
+                }
             }
             $query = rtrim($query, ",");
             $query .= " FROM `".$this->queryBlocks["table"]."`";
@@ -195,7 +198,6 @@ $module->{"db"} = new class {
 
         // UPDATE 문일 경우
         else if ($this->queryBlocks["type"] == "update") {
-                //$query = "UPDATE `lunchmate_users` SET  `phone_number`='".$yonseiAccount["phone"]."' WHERE `student_id`='".$yonseiAccount["id"]."';";
             $query .= "UPDATE `".$this->queryBlocks["table"]."` SET ";
              foreach($this->queryBlocks["target"] as $target) {
                 $query .= "`".$this->escape($target[0])."`=";
@@ -206,7 +208,6 @@ $module->{"db"} = new class {
 
         // INSERT 문일 경우
         else if ($this->queryBlocks["type"] == "insert") {
-    //$query = "INSERT INTO `lunchmate_users` (student_id, name_korean, name_english, phone_number) VALUES ('"
             $query .= "INSERT INTO `".$this->queryBlocks["table"]."` ";
             $_set = "";
             $_value = "";

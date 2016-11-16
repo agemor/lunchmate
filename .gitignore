@@ -1,4 +1,5 @@
 module.db.account.php
+module.sms.account.php
 
 # Logs
 logs

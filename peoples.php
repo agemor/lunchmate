@@ -1,48 +1,27 @@
 <?php
-include "db.php";
 include "session.php";
+include "module.db.php";
+include "module.sms.php";
 
 $location = "peoples.php";
-
-$response = ask("SELECT * FROM `lunchmate_users` ORDER BY RAND() LIMIT 20;");
+ 
+$peoples = $module->db->in("lunchmate_users")
+                      ->select("no")
+                      ->select("student_id")
+                      ->select("name_korean")
+                      ->select("affiliation")
+                      ->select("content")
+                      ->orderBy("RAND()")
+                      ->limit("20")
+                      ->goAndGetAll();
 
 // 내 프로필
-$mesponse;
-
 if(assigned()) {
-  $mesponse = askOne("SELECT * FROM `lunchmate_users` WHERE `student_id`='".getUserId()."';");
+    $me = $module->db->in("lunchmate_users")
+                     ->select("*")
+                     ->where("student_id", "=", getUserId())
+                     ->goAndGet();
 }
-
-/**
-* http://zetawiki.com/wiki/UTF-8_%ED%95%9C%EA%B8%80_%EC%B4%88%EC%84%B1_%EC%B6%94%EC%B6%9C_(PHP)
-*/
-function utf8_strlen($str) { return mb_strlen($str, 'UTF-8'); }
-function utf8_charAt($str, $num) { return mb_substr($str, $num, 1, 'UTF-8'); }
-function utf8_ord($ch) {
-  $len = strlen($ch);
-  if($len <= 0) return false;
-  $h = ord($ch{0});
-  if ($h <= 0x7F) return $h;
-  if ($h < 0xC2) return false;
-  if ($h <= 0xDF && $len>1) return ($h & 0x1F) <<  6 | (ord($ch{1}) & 0x3F);
-  if ($h <= 0xEF && $len>2) return ($h & 0x0F) << 12 | (ord($ch{1}) & 0x3F) << 6 | (ord($ch{2}) & 0x3F);          
-  if ($h <= 0xF4 && $len>3) return ($h & 0x0F) << 18 | (ord($ch{1}) & 0x3F) << 12 | (ord($ch{2}) & 0x3F) << 6 | (ord($ch{3}) & 0x3F);
-  return false;
-}
-
-function hangeulInitial($str) {
-  $cho = array("ㄱ","ㄲ","ㄴ","ㄷ","ㄸ","ㄹ","ㅁ","ㅂ","ㅃ","ㅅ","ㅆ","ㅇ","ㅈ","ㅉ","ㅊ","ㅋ","ㅌ","ㅍ","ㅎ");
-  $result = "";
-  for ($i=0; $i<utf8_strlen($str); $i++) {
-    $code = utf8_ord(utf8_charAt($str, $i)) - 44032;
-    if ($code > -1 && $code < 11172) {
-      $cho_idx = $code / 588;      
-      $result .= $cho[$cho_idx];
-    }
-  }
-  return $result;
-}
-
 
 ?>
 
@@ -98,19 +77,19 @@ function hangeulInitial($str) {
   echo '<div class="row">';
 
   // self page
-  if(isset($mesponse)) {
+  if(isset($me)) {
       echo '<div class="col-sm-6 col-md-4 col-lg-3">';
       echo '<div class="card card-outline-secondary card-block ">';
-      echo '<h4 class="card-title"><a class="namecard-title-text" href="#">'.hangeulInitial(base64_decode($mesponse["name_korean"])).'<small>#'.$mesponse["no"].'</small></a></h4>';
-      echo '<h6 class="card-subtitle text-muted">'.base64_decode($mesponse["affiliation"]).'</h6>';
+      echo '<h4 class="card-title"><a class="namecard-title-text" href="#">'.(mb_substr(base64_decode($me["name_korean"]), 1, 10, "utf-8")).'<small>#'.$me["no"].'</small></a></h4>';
+      echo '<h6 class="card-subtitle text-muted">'.base64_decode($me["affiliation"]).'</h6>';
       echo '<hr>';
-      echo '<p class="card-text">'.base64_decode($mesponse["content"]).'</p>';
+      echo '<p class="card-text">'.base64_decode($me["content"]).'</p>';
       echo '<a href="profile.php" class="btn btn-sm btn-outline-secondary ">프로필 수정하기</a>';
       echo '</div></div>';
   }
 
-  for ($i = 0; $i < count($response); $i++) {
-      $data = $response[$i];
+  for ($i = 0; $i < count($peoples); $i++) {
+      $data = $peoples[$i];
       if (assigned()) {
           if($data["student_id"] == getUserId()) {
               continue;
@@ -119,7 +98,7 @@ function hangeulInitial($str) {
 
       echo '<div class="col-sm-6 col-md-4 col-lg-3">';
       echo '<div class="card card-block ">';
-      echo '<h4 class="card-title"><a class="namecard-title-text" href="#">'.hangeulInitial(base64_decode($data["name_korean"])).'<small>#'.$data["no"].'</small></a>';
+      echo '<h4 class="card-title"><a class="namecard-title-text" href="#">'.(mb_substr(base64_decode($data["name_korean"]), 1, 10, "utf-8")).'<small>#'.$data["no"].'</small></a>';
       echo '<a class="pull-xs-right namecard-report-button" href="#"><small>신고</small></a></h4>';
       echo '<h6 class="card-subtitle text-muted">'.base64_decode($data["affiliation"]).'</h6>';
       echo '<hr>';
