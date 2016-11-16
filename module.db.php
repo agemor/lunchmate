@@ -120,36 +120,33 @@ $module->{"db"} = new class {
         return $this;
     }
 
-    public function update($row) {
+    public function update($row, $value) {
         $this->queryBlocks["type"] = "update";
-        $this->addTarget($row);
+        $this->addTarget(array($row, $value));
         return $this;
     }
 
-    public function insert($row) {
+    public function insert($row, $value) {
         $this->queryBlocks["type"] = "insert";
-        $this->addTarget($row);
+        $this->addTarget(array($row, $value));
         return $this;
     }
 
-    public function where($row, $operator, $value) {
-        $this->and($row, $operator, $value);
+    public function delete() {
+        $this->queryBlocks["type"] = "delete";
         return $this;
     }
 
-    public function and($row, $operator, $value) {
-        if (!isset($this->queryBlocks["conditions"])) {
+    public function where($row, $operator, $value, $conjunction = null) {
+
+        if ($conjunction === null) {
+            $conjunction = "AND";
+        }
+
+        $this->and($row, $operator, $value);if (!isset($this->queryBlocks["conditions"])) {
             $this->queryBlocks["conditions"] = array();
         }
-        array_push($this->queryBlocks["conditions"], array($row, $operator, $value, "and"));
-        return $this;
-    }
-
-    public function or($row, $operator, $value) {
-        if (!isset($this->queryBlocks["conditions"])) {
-            $this->queryBlocks["conditions"] = array();
-        }
-        array_push($this->queryBlocks["conditions"], array($row, $operator, $value, "or"));
+        array_push($this->queryBlocks["conditions"], array($row, $operator, $value, $conjunction));
         return $this;
     }
 
@@ -183,12 +180,64 @@ $module->{"db"} = new class {
             $query .= " FROM `".$this->queryBlocks["table"]."`";
         }
 
-        // where limit order by 등등
+        // DELETE 문일 경우
+        else if ($this->queryBlocks["type"] == "delete") {
+            $query = "DELETE FROM `".$this->queryBlocks["table"]."`";
+        }
 
-        mysql_real_escape_string()
+        // UPDATE 문일 경우
+        else if ($this->queryBlocks["type"] == "update") {
+                //$query = "UPDATE `lunchmate_users` SET  `phone_number`='".$yonseiAccount["phone"]."' WHERE `student_id`='".$yonseiAccount["id"]."';";
+            $query .= "UPDATE `".$this->queryBlocks["table"]."` SET";
+             foreach($this->queryBlocks["target"] as $target) {
+                $query .= "`".mysql_real_escape_string($target[0])."`=";
+                $query .= "\'".mysql_real_escape_string($target[1])."\',";
+            }
+            rtrim($query, ",");
+        }
 
-        $this->queryBlocks = array();
-        return sth
+        // INSERT 문일 경우
+        else if ($this->queryBlocks["type"] == "insert") {
+    //$query = "INSERT INTO `lunchmate_users` (student_id, name_korean, name_english, phone_number) VALUES ('"
+            $query .= "INSERT INTO `".$this->queryBlocks["table"]."` SET";
+            $_set = "";
+            $_value = "";
+            foreach($this->queryBlocks["target"] as $target) {
+                $_set .= "`".mysql_real_escape_string($target[0])."`,";
+                $_value .= "\'".mysql_real_escape_string($target[1])."\',";
+            }
+            rtrim($_set, ",");
+            rtrim($_value, ",");
+            $query .= " (".$_set.") VALUES (".$_value.")";
+        }
+
+        // WHERE 문
+        if (isset($this->queryBlocks["conditions"])) {
+            $query .= " WHERE ";
+
+            $length = count($this->queryBlocks["conditions"]);
+            for ($i = 0; $i < $length; $i++) {
+                $condition = $this->queryBlocks["conditions"][$i];
+                $query .= "`".mysql_real_escape_string($condition[0])."`".$condition[1]."\'".mysql_real_escape_string($condition[2])."\'";
+                if ($i + 1 < $length) {
+                    $query .= " ".$condition[3]." ";
+                }
+            }
+        }
+
+        // ORDER BY 문
+        if(isset($this->queryBlocks["order"])) {
+            $query .= " ORDER BY ".$this->queryBlocks["order"];
+        }
+
+        // LIMIT 문
+        if(isset($this->queryBlocks["limit"])) {
+            $query .= " LIMIT ".$this->queryBlocks["limit"];
+        }
+
+        $query .= ";";
+
+        return $query;
     }
 
     private function addTarget($target) {
