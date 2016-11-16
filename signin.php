@@ -3,7 +3,7 @@ include "session.php";
 include "module.db.php";
 include "module.yonsei.php";
 
-const HOST = "http://www.lunchmate.co.kr/";
+const HOST = "/";
 
 /* 전송된 데이터 래핑 */
 $userId = stripslashes($_POST["user-id"]);
@@ -21,9 +21,6 @@ if (count($yonseiAccount) < 1) {
 }
 
 // 계정 조회
-//$query = "SELECT `student_id` FROM `lunchmate_users` WHERE `student_id`='".$yonseiAccount["id"]."';";
-// $response = $module->db->goAndGet($query);
-
 $response = $module->db->in('lunchmate_users')
                        ->select('student_id')
                        ->where('student_id', '=', $yonseiAccount["id"])
@@ -34,8 +31,6 @@ $response = $module->db->in('lunchmate_users')
 if ($response) {
 
     // 연락처 업데이트
-    //$query = "UPDATE `lunchmate_users` SET  `phone_number`='".$yonseiAccount["phone"]."' WHERE `student_id`='".$yonseiAccount["id"]."';";
-    //$response = $module->db->go($query);
     $response = $module->db->in('lunchmate_users')
                            ->update('phone_number', $yonseiAccount["phone"])
                            ->where('student_id', '=', $yonseiAccount["id"])
@@ -53,19 +48,19 @@ if ($response) {
 else {
 
     // 계정 생성
-    //$query = "INSERT INTO `lunchmate_users` (student_id, name_korean, name_english, phone_number) VALUES ('"
-    //        .$yonseiAccount["id"] ."', '".base64_encode($yonseiAccount["korean"])."', '".$yonseiAccount["english"]."', '".$yonseiAccount["phone"]."')";
-    //$response = $module->db->go($query);
-
     $response = $module->db->in('lunchmate_users')
                            ->insert('student_id', $yonseiAccount["id"])
-                           ->insert('name_korean', base64_encode($yonseiAccount["korean"])))
+                           ->insert('name_korean', base64_encode($yonseiAccount["korean"]))
                            ->insert('name_english', $yonseiAccount["english"])
                            ->insert('phone_number', $yonseiAccount["phone"])
                            ->go();
 
     // 회원가입 성공
     if ($response) {
+
+        // 세션 등록
+        assign($yonseiAccount["id"]);
+
         header('Location: '.HOST.'?signup-success'); 
     }
 

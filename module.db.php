@@ -10,7 +10,9 @@ $module->{"db"} = new class {
 
     public $connected = false;
     public $connection;
+
     public $recentError;
+    public $recentQuery;
 
     public $queryBlocks = array();
 
@@ -35,6 +37,10 @@ $module->{"db"} = new class {
         return $this->connected;
     }
 
+    public function rq() {
+        return $this->recentQuery;
+    }
+
     /* 응답 반환이 필요하지 않은 쿼리문을 수행한다 */
     public function go() {
 
@@ -45,6 +51,7 @@ $module->{"db"} = new class {
 
         // 쿼리 수행
         $query = $this->formulate();
+        $this->recentQuery = $query;
         $result = $this->connection->query($query);
 
         // 실패했을 경우
@@ -65,6 +72,7 @@ $module->{"db"} = new class {
 
         // 쿼리 수행
         $query = $this->formulate();
+        $this->recentQuery = $query;
         $result = $this->connection->query($query);
 
         // 실패했을 경우
@@ -94,6 +102,7 @@ $module->{"db"} = new class {
 
         // 쿼리 수행
         $query = $this->formulate();
+        $this->recentQuery = $query;
         $result = $this->connection->query($query);
 
         // 실패했을 경우
@@ -142,8 +151,7 @@ $module->{"db"} = new class {
         if ($conjunction === null) {
             $conjunction = "AND";
         }
-
-        $this->and($row, $operator, $value);if (!isset($this->queryBlocks["conditions"])) {
+        if (!isset($this->queryBlocks["conditions"])) {
             $this->queryBlocks["conditions"] = array();
         }
         array_push($this->queryBlocks["conditions"], array($row, $operator, $value, $conjunction));
@@ -174,9 +182,9 @@ $module->{"db"} = new class {
             //$query = "SELECT `student_id` FROM `lunchmate_users` WHERE `student_id`='".$yonseiAccount["id"]."';";
             $query .= "SELECT ";
             foreach($this->queryBlocks["target"] as $target) {
-                $query .= "`".mysql_real_escape_string($target)."`,";
+                $query .= "`".$this->escape($target)."`,";
             }
-            rtrim($query, ",");
+            $query = rtrim($query, ",");
             $query .= " FROM `".$this->queryBlocks["table"]."`";
         }
 
@@ -188,26 +196,26 @@ $module->{"db"} = new class {
         // UPDATE 문일 경우
         else if ($this->queryBlocks["type"] == "update") {
                 //$query = "UPDATE `lunchmate_users` SET  `phone_number`='".$yonseiAccount["phone"]."' WHERE `student_id`='".$yonseiAccount["id"]."';";
-            $query .= "UPDATE `".$this->queryBlocks["table"]."` SET";
+            $query .= "UPDATE `".$this->queryBlocks["table"]."` SET ";
              foreach($this->queryBlocks["target"] as $target) {
-                $query .= "`".mysql_real_escape_string($target[0])."`=";
-                $query .= "\'".mysql_real_escape_string($target[1])."\',";
+                $query .= "`".$this->escape($target[0])."`=";
+                $query .= "'".$this->escape($target[1])."',";
             }
-            rtrim($query, ",");
+            $query = rtrim($query, ",");
         }
 
         // INSERT 문일 경우
         else if ($this->queryBlocks["type"] == "insert") {
     //$query = "INSERT INTO `lunchmate_users` (student_id, name_korean, name_english, phone_number) VALUES ('"
-            $query .= "INSERT INTO `".$this->queryBlocks["table"]."` SET";
+            $query .= "INSERT INTO `".$this->queryBlocks["table"]."` ";
             $_set = "";
             $_value = "";
             foreach($this->queryBlocks["target"] as $target) {
-                $_set .= "`".mysql_real_escape_string($target[0])."`,";
-                $_value .= "\'".mysql_real_escape_string($target[1])."\',";
+                $_set .= "`".$this->escape($target[0])."`,";
+                $_value .= "'".$this->escape($target[1])."',";
             }
-            rtrim($_set, ",");
-            rtrim($_value, ",");
+            $_set = rtrim($_set, ",");
+            $_value = rtrim($_value, ",");
             $query .= " (".$_set.") VALUES (".$_value.")";
         }
 
@@ -218,7 +226,7 @@ $module->{"db"} = new class {
             $length = count($this->queryBlocks["conditions"]);
             for ($i = 0; $i < $length; $i++) {
                 $condition = $this->queryBlocks["conditions"][$i];
-                $query .= "`".mysql_real_escape_string($condition[0])."`".$condition[1]."\'".mysql_real_escape_string($condition[2])."\'";
+                $query .= "`".$this->escape($condition[0])."`".$condition[1]."'".$this->escape($condition[2])."'";
                 if ($i + 1 < $length) {
                     $query .= " ".$condition[3]." ";
                 }
@@ -236,7 +244,7 @@ $module->{"db"} = new class {
         }
 
         $query .= ";";
-
+        $this->queryBlocks = array();
         return $query;
     }
 
@@ -245,6 +253,12 @@ $module->{"db"} = new class {
             $this->queryBlocks["target"] = array();
         }
         array_push($this->queryBlocks["target"], $target);
+    }
+
+    private function escape($value) {
+        $search = array("\\",  "\x00", "\n",  "\r",  "'",  '"', "\x1a");
+        $replace = array("\\\\","\\0","\\n", "\\r", "\'", '\"', "\\Z");
+        return str_replace($search, $replace, $value);
     }
 }
 ?>
