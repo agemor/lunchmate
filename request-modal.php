@@ -17,6 +17,12 @@
 <h6>가능한 스케줄</h6>
 
 <?php
+
+include "widget.timetable.php";
+
+echo $widget->timetable->get();
+
+/*
 $now = new DateTime();
 $now->setTimezone(new DateTimeZone("Asia/Seoul"));
 
@@ -27,6 +33,9 @@ $showDays = 4;
 $dayIndex = intval($now->format("w"));
 $currentHour = intval($now->format("H"));
 echo '<table class="table m-t-2 table-bordered" id="scheduleTable">';
+
+
+
 
 $times = array(7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23);
 
@@ -55,7 +64,7 @@ for ($i = 0; $i < count($times); $i++) {
     echo '</tr>';
 }
 echo '</tbody>';
-echo '</table>';
+echo '</table>'; */
 ?>
 <script type="text/javascript">
   $("#scheduleTable").on("click", "td", function() {
