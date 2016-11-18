@@ -23,8 +23,14 @@
 
           ?>
         <script type="text/javascript">
-          function setRequestModalTitle(title) {
-              $('#requestModalTitle').text(title);
+
+        var userName;
+        var userNo;
+
+          function setRequestModalTitle(name, no) {
+            userName = name;
+            userNo = no;
+              $('#requestModalTitle').text(name+"님에게 요청 보내기");
           }
 
 
