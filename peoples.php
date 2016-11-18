@@ -4,7 +4,7 @@ include "module.db.php";
 include "module.sms.php";
 
 $location = "peoples.php";
- 
+
 $peoples = $module->db->in("lunchmate_users")
                       ->select("no")
                       ->select("student_id")
@@ -95,16 +95,19 @@ if(assigned()) {
               continue;
           }
       }
+      $userName = (mb_substr(base64_decode($data["name_korean"]), 1, 10, "utf-8")).'<small>#'.$data["no"].'</small>';
 
       echo '<div class="col-sm-6 col-md-4 col-lg-3">';
       echo '<div class="card card-block ">';
+      echo '<input type="hidden" name="no" value="'.$data["no"].'"';
+
       echo '<h4 class="card-title"><a class="namecard-title-text" href="#">'.(mb_substr(base64_decode($data["name_korean"]), 1, 10, "utf-8")).'<small>#'.$data["no"].'</small></a>';
       echo '<a class="pull-xs-right namecard-report-button" href="#"><small>신고</small></a></h4>';
       echo '<h6 class="card-subtitle text-muted">'.base64_decode($data["affiliation"]).'</h6>';
       echo '<hr>';
       echo '<p>'.base64_decode($data["content"]).'</p>';
-      echo '<button type="button" class="btn btn-sm btn-outline-secondary">+ 관심</button>  ';
-      echo '<button type="button" class="btn btn-sm btn-outline-info" data-toggle="modal" data-target="#myModal">안녕하세요</button>';
+      echo '<button type="button" class="btn btn-sm btn-outline-secondary" id="interestButton">+ 관심</button>  ';
+      echo '<button type="button" class="btn btn-sm btn-outline-info" id="requestButton" data-toggle="modal" data-target="#myModal"">안녕하세요</button>';
       echo '</div></div>';
 
   }
@@ -112,7 +115,12 @@ if(assigned()) {
   echo '</div>';
 
 ?>
+<script type="text/javascript">
+  $("#requestButton").click(function(event) {
+    console.log($(event.target).parent());
+  })
 
+</script>
 
 </div>
 

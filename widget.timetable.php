@@ -45,8 +45,10 @@ $widget->{"timetable"} = new class {
         $d = '<table class="table m-t-2 table-bordered" id="scheduleTable">';
         $d.= '<thead><tr>';
         $d.= '<th>#</th>';
+
         for ($i = 0; $i < self::AVAILABLE_DAYS; $i++)
             $d.= '<th style="width: 25%" class="text-xs-center">'.self::DAYS[($now["day"] + $i) % 7].'</th>';
+
         $d.= '</thead></tr>';
         $d.= '<tbody>';
 
@@ -54,7 +56,6 @@ $widget->{"timetable"} = new class {
             $d.= '<tr>';
             $d.= '<th scope="row">'.$value.'</th>';
             for ($j = 0; $j < self::AVAILABLE_DAYS; $j++) {
-
                 // 만약 선택 불가능한 시간이라면
                 if ($j == 0 && $key <= $now["hour"]) {
                   $d.= '<td class="table-active"></td>';
@@ -67,7 +68,6 @@ $widget->{"timetable"} = new class {
         }
         $d.= '</tbody>';
         $d.= '</table>';
-
         return $d;
     }
 
