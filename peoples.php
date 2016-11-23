@@ -11,6 +11,7 @@ $peoples = $module->db->in("lunchmate_users")
                       ->select("name_korean")
                       ->select("affiliation")
                       ->select("content")
+                      ->select("interests_received")
                       ->orderBy("RAND()")
                       ->limit("20")
                       ->goAndGetAll();
@@ -21,6 +22,11 @@ if(assigned()) {
                      ->select("*")
                      ->where("student_id", "=", getUserId())
                      ->goAndGet();
+
+    $sentInterests = $module->db->in("lunchmate_interests")
+                     ->select("*")
+                     ->where("sender_id", "=", getUserId())
+                     ->goAndGetAll();
 }
 
 ?>
@@ -93,7 +99,7 @@ if(assigned()) {
 
 .card {
   display: inline-block;
-  width: 100%; 
+  width: 100%;
 }
 
 
@@ -114,11 +120,11 @@ if(assigned()) {
       echo '<h6 class="card-subtitle text-muted">'.base64_decode($me["affiliation"]).'</h6>';
       echo '<hr>';
       echo '<p class="card-text">'.base64_decode($me["content"]).'</p>';
+      echo '<button type="button" class="btn btn-sm btn-outline-secondary" id="interestButton" disabled>좋아요 '.$me["interests_received"].'</button>  ';
       echo '<a href="profile.php" class="btn btn-sm btn-outline-secondary ">프로필 수정하기</a>';
       echo '</div>';
       //echo '</div>';
   }
-
   for ($i = 0; $i < count($peoples); $i++) {
       $data = $peoples[$i];
       if (assigned()) {
@@ -136,8 +142,9 @@ if(assigned()) {
       echo '<h6 class="card-subtitle text-muted">'.base64_decode($data["affiliation"]).'</h6>';
       echo '<hr>';
       echo '<p>'.base64_decode($data["content"]).'</p>';
-      echo '<button type="button" class="btn btn-sm btn-outline-secondary" id="interestButton">+ 관심</button>  ';
-      echo '<button type="button" class="btn btn-sm btn-outline-info request-button" id="requestButton" data-toggle="modal" data-target="#myModal" data-name="'.$userName.'" data-no="'.$data["no"].'">안녕하세요</button>';
+
+      echo '<button type="button" class="btn btn-sm btn-outline-secondary interest-button" data-no="'.$data["no"].'">좋아요 '.$data["interests_received"].'</button>  ';
+      echo '<button type="button" class="btn btn-sm btn-outline-info request-button" data-toggle="modal" data-target="#myModal" data-name="'.$userName.'" data-no="'.$data["no"].'">안녕하세요</button>';
       echo '</div>';
      //echo '</div>';
 
@@ -150,6 +157,25 @@ if(assigned()) {
   $(".request-button").click(function(event) {
     setRequestModalTitle($(this).data("name"), $(this).data("no"));
   })
+
+  $(".interest-button").click(function(event) {
+    giveInterest($(this).data("no"));
+  })
+
+  function giveInterest(targetNo) {
+    var httpRequest = new XMLHttpRequest();
+
+    var formData  = new FormData();
+    formData.append("target_no", targetNo);
+
+    httpRequest.addEventListener('load', function(event) {
+      /// Intetest 수 업데이트
+      alert('Yeah! Data sent and response loaded.');
+    });
+
+    httpRequest.open('POST', './interest.php');
+    httpRequest.send(formData);
+  }
 
 </script>
 

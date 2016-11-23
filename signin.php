@@ -16,7 +16,7 @@ $yonseiAccount = $module->yonsei->signin($userId, $userPassword);
 if (count($yonseiAccount) < 1) {
 
     // 실패 페이지로 이동
-    header('Location: '.HOST.'?signin-fail');
+    header('Location: '.HOST.'?result=signin-fail');
     exit();
 }
 
@@ -40,9 +40,9 @@ if ($response) {
     assign($yonseiAccount["id"]);
 
     // 성공 페이지로 이동
-    header('Location: '.HOST.'?signin-success');
+    header('Location: '.HOST.'?result=signin-success');
     exit();
-} 
+}
 
 // 새로운 계정
 else {
@@ -61,12 +61,12 @@ else {
         // 세션 등록
         assign($yonseiAccount["id"]);
 
-        header('Location: '.HOST.'?signup-success'); 
+        header('Location: '.HOST.'?result=signup-success');
     }
 
     // 회원가입 실패
     else {
-        header('Location: '.HOST.'?signup-fail');
+        header('Location: '.HOST.'?result=signup-fail');
     }
     exit();
 }

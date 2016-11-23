@@ -15,7 +15,7 @@
           echo '<li class="nav-item '.($location == "profile.php" ? "active" : "" ).'"><a class="nav-link" href="profile.php">내 프로필</a></li>';
         }
         ?>
-        
+
         <li class="nav-item pull-xs-right">
           <?php
             if (!assigned()) {
@@ -25,7 +25,7 @@
             }
           ?>
 
-          
+
         </li>
       </ul>
     </div>
@@ -52,3 +52,24 @@
     </div>
   </div>
 </div>
+
+<?php
+
+// 로그인 성공 / 실패 메시지
+if (isset($_GET["result"]) && $_GET["result"] != "signin-success" && $_GET["result"] != "signup-success") {
+  echo '<div id="updateModal" class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">';
+  echo '<div class="modal-dialog modal-sm">';
+  echo '<div class="modal-content container">';
+
+  if ($_GET["result"] == "signin-fail") {
+    echo '<p class="text-xs-center m-y-2">로그인에 실패하였습니다.<br/>학번과 비밀번호를 확인해 주세요.</p>';
+  }
+
+  else if ($_GET["result"] == "signup-fail") {
+    echo '<p class="text-xs-center m-y-2">계정 생성에 실패하였습니다.</p>';
+  }
+  echo '</div></div></div>';
+  echo '<script>$("#updateModal").modal()</script>';
+}
+
+?>
