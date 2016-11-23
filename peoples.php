@@ -143,7 +143,16 @@ if(assigned()) {
       echo '<hr>';
       echo '<p>'.base64_decode($data["content"]).'</p>';
 
-      echo '<button type="button" class="btn btn-sm btn-outline-secondary interest-button" data-no="'.$data["no"].'">좋아요 '.$data["interests_received"].'</button>  ';
+      // 이미 interest 준 버튼은 class를 다르게 함
+      $interested = false;
+      foreach ($sentInterests as $sentInterest) {
+          if ($sentInterest['recipient_id'] == $data["student_id"]) {
+            $interested = true;
+            break;
+          }
+      }
+
+      echo '<button type="button" class="btn btn-sm '.($interested ? "btn-primary" : "btn-outline-secondary").' interest-button" data-no="'.$data["no"].'">좋아요 '.$data["interests_received"].'</button>  ';
       echo '<button type="button" class="btn btn-sm btn-outline-info request-button" data-toggle="modal" data-target="#myModal" data-name="'.$userName.'" data-no="'.$data["no"].'">안녕하세요</button>';
       echo '</div>';
      //echo '</div>';
@@ -160,10 +169,10 @@ if(assigned()) {
 
   $(".interest-button").click(function(event) {
     $(this).text("처리 중...");
-    giveInterest($(this).data("no"));
+    giveInterest($(this).data("no"), this);
   })
 
-  function giveInterest(targetNo) {
+  function giveInterest(targetNo, buttonRef) {
     var httpRequest = new XMLHttpRequest();
 
     var formData  = new FormData();
@@ -171,9 +180,17 @@ if(assigned()) {
 
     httpRequest.addEventListener('load', function(event) {
       /// Intetest 수 업데이트
-      $(this).text("처리 중...");
+      var result = JSON.parse(httpRequest.responseText);
+      if (result.response) {
+        $(buttonRef).text("좋아요 " +result.interests);
+        $(buttonRef).toggleClass("btn-primary btn-outline-secondary");
 
-      alert(httpRequest.responseText);
+      } else {
+        $(buttonRef).text("처리 실패");
+      }
+
+
+      //alert(httpRequest.responseText);
     });
 
     httpRequest.open('POST', './interest.php');
