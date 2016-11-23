@@ -53,6 +53,7 @@ else {
                            ->insert('name_korean', base64_encode($yonseiAccount["korean"]))
                            ->insert('name_english', $yonseiAccount["english"])
                            ->insert('phone_number', $yonseiAccount["phone"])
+                           ->insert('alarm_settings', "105")
                            ->go();
 
     // 회원가입 성공

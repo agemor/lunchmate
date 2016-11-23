@@ -51,18 +51,19 @@ $widget->{"timetable"} = new class {
 
         $d.= '</thead></tr>';
         $d.= '<tbody>';
-
+        $index = 0;
         foreach (self::TIMES as $key => $value) {
             $d.= '<tr>';
             $d.= '<th scope="row">'.$value.'</th>';
             for ($j = 0; $j < self::AVAILABLE_DAYS; $j++) {
                 // 만약 선택 불가능한 시간이라면
                 if ($j == 0 && $key <= $now["hour"]) {
-                  $d.= '<td class="table-active"></td>';
+                  $d.= '<td class="table-active" data-index="'.$index.'"></td>';
                 } else {
-                  $d.= '<td>';
+                  $d.= '<td data-index="'.$index.'">';
                   $d.= '</td>';
                 }
+                $index++;
             }
             $d.= '</tr>';
         }

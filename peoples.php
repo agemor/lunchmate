@@ -153,7 +153,7 @@ if(assigned()) {
       }
 
       echo '<button type="button" class="btn btn-sm '.($interested ? "btn-primary" : "btn-outline-secondary").' interest-button" data-no="'.$data["no"].'">좋아요 '.$data["interests_received"].'</button>  ';
-      echo '<button type="button" class="btn btn-sm btn-outline-info request-button" data-toggle="modal" data-target="#myModal" data-name="'.$userName.'" data-no="'.$data["no"].'">안녕하세요</button>';
+      echo '<button type="button" class="btn btn-sm btn-outline-info request-button" data-toggle="modal" data-target="#requestModal" data-name="'.$userName.'" data-no="'.$data["no"].'">안녕하세요</button>';
       echo '</div>';
      //echo '</div>';
 
@@ -163,37 +163,93 @@ if(assigned()) {
 
 ?>
 <script type="text/javascript">
+
   $(".request-button").click(function(event) {
-    setRequestModalTitle($(this).data("name"), $(this).data("no"));
-  })
+    setRequestModal($(this).data("name"), $(this).data("no"));
+  });
+
+  $(".request-send-button").click(function(event) {
+
+    // 메시지 읽어오기
+    var message = $("#requestModalMessageInput").val();
+
+    // 스케줄 리스트 생성
+    var schedule = [];
+    $("#scheduleTable tr").each(function () {
+        $('td', this).each(function () {
+            if($(this).hasClass("bg-primary")) {
+              schedule.push($(this).data("index"));
+            }
+         })
+    });
+
+    if (schedule.length < 1) return;
+
+    sendRequest(userNo, message, schedule.join());
+    $(".request-send-button").text("처리중...");
+    //setRequestModal($(this).data("name"), $(this).data("no"));
+  });
 
   $(".interest-button").click(function(event) {
     $(this).text("처리 중...");
-    giveInterest($(this).data("no"), this);
-  })
+    sendInterest($(this).data("no"), this);
+  });
 
-  function giveInterest(targetNo, buttonRef) {
+  $("#scheduleTable").on("click", "td", function() {
+      if(!$(this).hasClass("table-active"))
+      $(this).toggleClass("bg-primary");
+   });
+
+  var userName;
+  var userNo;
+
+  function setRequestModal(name, no) {
+    userName = name;
+    userNo = no;
+    $('.modal-title').text(name + "님에게 요청 보내기");
+    $("#requestModalMessageInput").val("");
+    // 테이블 선택 초기화
+    $("#scheduleTable tr").each(function () {
+        $('td', this).each(function () {
+            //console.log($(this).data("index"));
+            $(this).removeClass("bg-primary");
+         })
+    });
+  }
+
+  function sendRequest(targetNo, message, schedule) {
     var httpRequest = new XMLHttpRequest();
-
     var formData  = new FormData();
     formData.append("target_no", targetNo);
+    formData.append("message", message);
+    formData.append("schedule", schedule);
 
     httpRequest.addEventListener('load', function(event) {
-      /// Intetest 수 업데이트
+      //$("#requestModal").hide();
+      $('#requestModal').modal('hide');
+      alert(httpRequest.responseText)
+      showMessage(userName + "님에게 요청을 보냈습니다!");
+      //var result = JSON.parse(httpRequest.responseText);
+    });
+    httpRequest.open('POST', './send-request.php');
+    httpRequest.send(formData);
+  }
+
+  function sendInterest(targetNo, buttonRef) {
+    var httpRequest = new XMLHttpRequest();
+    var formData  = new FormData();
+
+    formData.append("target_no", targetNo);
+    httpRequest.addEventListener('load', function(event) {
       var result = JSON.parse(httpRequest.responseText);
       if (result.response) {
         $(buttonRef).text("좋아요 " +result.interests);
         $(buttonRef).toggleClass("btn-primary btn-outline-secondary");
-
       } else {
         $(buttonRef).text("처리 실패");
       }
-
-
-      //alert(httpRequest.responseText);
     });
-
-    httpRequest.open('POST', './interest.php');
+    httpRequest.open('POST', './send-interest.php');
     httpRequest.send(formData);
   }
 

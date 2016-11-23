@@ -12,7 +12,7 @@ function assertc($condition, $text) {
 }
 
 // 로그인 체크
-assertc(assigned(), 'signin-required');
+assertc(assigned(), '{"response": false, "message": "signin-required"}');
 
 // 기여자 로드
 $sender = $module->db->in("lunchmate_users")

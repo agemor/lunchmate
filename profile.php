@@ -1,7 +1,7 @@
 <?php
 include "db.php";
 include "session.php";
-  
+
 $location = "profile.php";
 $success = true;
 $message = "";
@@ -9,7 +9,7 @@ $profileChanged = false;
 
 if (!assigned()) {
   header("Location: /");
-  exit();  
+  exit();
 }
 
 // 설정 모드
@@ -17,12 +17,12 @@ if (isset($_POST["setting-type"])) {
 
   // 알람 옵션 설정
   if ($_POST["setting-type"] == "alarm") {
-      $settingsValue = (isset($_POST["mutual-alarm"]) ? 3 : 1) * (isset($_POST["schedule-fix-alarm"]) ? 5 : 1);
+      $settingsValue = (isset($_POST["mutual-alarm"]) ? 3 : 1) * (isset($_POST["schedule-fix-alarm"]) ? 5 : 1) * 7;
       $success = tell("UPDATE `lunchmate_users` SET  `alarm_settings`='".$settingsValue."' WHERE `student_id`='".getUserId()."';");
       if (!$success) {
         $message = "알림 설정을 업데이트하는데 오류가 발생했습니다.";
       }
-  } 
+  }
 
   // 소개
   else {
@@ -61,7 +61,7 @@ $response = askOne("SELECT * FROM `lunchmate_users` WHERE `student_id`='".getUse
     <main>
       <div class="container m-y-2">
 
-      <?php 
+      <?php
 
         if(!$success) {
           echo '<div class="alert alert-danger" role="alert">';
@@ -83,7 +83,7 @@ $response = askOne("SELECT * FROM `lunchmate_users` WHERE `student_id`='".getUse
         }
       ?>
 
-      
+
         <div class="row">
           <div class="col-lg-6">
             <div class="card">
