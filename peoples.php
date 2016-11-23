@@ -170,7 +170,7 @@ if(assigned()) {
 
     httpRequest.addEventListener('load', function(event) {
       /// Intetest 수 업데이트
-      alert('Yeah! Data sent and response loaded.');
+      alert(httpRequest.responseText);
     });
 
     httpRequest.open('POST', './interest.php');
