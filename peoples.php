@@ -225,11 +225,19 @@ if(assigned()) {
     formData.append("schedule", schedule);
 
     httpRequest.addEventListener('load', function(event) {
-      //$("#requestModal").hide();
+      $(".request-send-button").text("요청 보내기");
       $('#requestModal').modal('hide');
-      alert(httpRequest.responseText)
-      showMessage(userName + "님에게 요청을 보냈습니다!");
-      //var result = JSON.parse(httpRequest.responseText);
+
+      var result = JSON.parse(httpRequest.responseText);
+      if (result.response) {
+        showMessage(userName + "님에게 요청을 보냈습니다!");
+      } else {
+        if (result.message == "duplicate-request") {
+          showMessage("이미 요청을 보낸 상태입니다. 다시 요청하시려면 보낸 요청을 취소해 주세요.");
+        } else {
+          showMessage("요청을 보내지 못했습니다. 다시 시도해 주세요.");
+        }
+      }
     });
     httpRequest.open('POST', './send-request.php');
     httpRequest.send(formData);
