@@ -159,6 +159,7 @@ if(assigned()) {
   })
 
   $(".interest-button").click(function(event) {
+    $(this).text("처리 중...");
     giveInterest($(this).data("no"));
   })
 
@@ -170,6 +171,8 @@ if(assigned()) {
 
     httpRequest.addEventListener('load', function(event) {
       /// Intetest 수 업데이트
+      $(this).text("처리 중...");
+
       alert(httpRequest.responseText);
     });
 

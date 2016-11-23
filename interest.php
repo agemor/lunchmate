@@ -24,13 +24,13 @@ $sender = $module->db->in("lunchmate_users")
                  ->select("alarm_settings")
                  ->where("student_id", "=", getUserId())
                  ->goAndGet();
-assertc($sender, 'cannot-load-sender');
+assertc($sender, '{"response": false, "message": "cannot-load-sender"}');
 
 // 수혜자 로드
 $useTargetNo = false;
 if (!isset($_POST["target_id"])) {
   // id가 없으면 no라도 있어야한다.
-  assertc(isset($_POST["target_no"]), 'not-enough-parameters');
+  assertc(isset($_POST["target_no"]), '{"response": false, "message": "not-enough-parameters"}');
   $useTargetNo = true;
 }
 
@@ -43,7 +43,7 @@ $recipient = $module->db->in("lunchmate_users")
                  ->select("alarm_settings")
                  ->where(($useTargetNo ? "no" : "student_id"), "=", ($useTargetNo ? $_POST["target_no"] : $_POST["target_id"]))
                  ->goAndGet();
-assertc($recipient, 'cannot-load-recipient');
+assertc($recipient, '{"response": false, "message": "cannot-load-recipient"}');
 
 
 // 이미 interest 준 사람인지 체크 -> 감소 작업 플래그 on
@@ -62,7 +62,7 @@ if ($interestLog) {
 
 // 증가형일 경우 크레딧 필요
 if (!$minusFlag && intval($sender["interests_credit"]) < 1 ) {
-  echo "no-credit";
+  echo '{"response": false, "message": "no-credit"}';
   exit();
 }
 
@@ -72,7 +72,7 @@ $response = $module->db->in('lunchmate_users')
                        ->update('interests_sent', intval($sender["interests_sent"]) + ($minusFlag ? -1 : 1))
                        ->where('student_id', '=', getUserId())
                        ->go();
-assertc($response, 'cannot-update-sender');
+assertc($response, '{"response": false, "message": "cannot-update-sender"}');
 
 
 // 상대방 정보에서 interest 수 올리기
@@ -80,7 +80,7 @@ $response = $module->db->in('lunchmate_users')
                        ->update('interests_received', intval($recipient["interests_received"]) + ($minusFlag ? -1 : 1))
                        ->where('student_id', '=', $recipient["student_id"])
                        ->go();
-assertc($response, 'cannot-update-recipient');
+assertc($response, '{"response": false, "message": "cannot-update-recipient"}');
 
 // 레코드 지우기
 if ($minusFlag) {
@@ -90,9 +90,9 @@ if ($minusFlag) {
                          ->where("sender_id", "=", getUserId())
                          ->where("recipient_id", "=", $recipient["student_id"])
                          ->go();
-  assertc($response, 'cannot-delete-record');
+  assertc($response, '{"response": false, "message": "cannot-delete-record"}');
 
-  echo "success";
+  echo '{"response": true, "type": "decrease", "interests": '.(intval($recipient["interests_received"]) - 1).'}';
   exit();
 }
 
@@ -102,7 +102,7 @@ else {
                          ->insert('sender_id', getUserId())
                          ->insert('recipient_id', $recipient["student_id"])
                          ->go();
-  assertc($response, 'cannot-insert-record');
+  assertc($response, '{"response": false, "message": "cannot-insert-record"}');
 }
 
 // 만약 상대방 interest record에 내가 있으면
@@ -130,5 +130,5 @@ if ($interestLog) {
 
 
 // 결과 리턴
-echo 'success';
+echo '{"response": true, "type": "increase", "interests": '.(intval($recipient["interests_received"]) + 1).'}';
 ?>
