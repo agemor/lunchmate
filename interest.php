@@ -45,6 +45,8 @@ $recipient = $module->db->in("lunchmate_users")
                  ->goAndGet();
 assertc($recipient, '{"response": false, "message": "cannot-load-recipient"}');
 
+// 자기 자신에 대한 수혜는 금지
+assertc($recipient["no"] != $sender["no"], '{"response": false, "message": "self"}');
 
 // 이미 interest 준 사람인지 체크 -> 감소 작업 플래그 on
 $interestLog = $module->db->in("lunchmate_interests")
