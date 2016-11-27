@@ -151,9 +151,13 @@ if(assigned()) {
             break;
           }
       }
+      if (assigned()) {
+        echo '<button type="button" class="btn btn-sm '.($interested ? "btn-primary" : "btn-outline-secondary").' interest-button" data-no="'.$data["no"].'">좋아요 '.$data["interests_received"].'</button>  ';
+        echo '<button type="button" class="btn btn-sm btn-outline-info request-button" data-toggle="modal" data-target="#requestModal" data-name="'.$userName.'" data-no="'.$data["no"].'">안녕하세요</button>';
+      } else {
+        echo '<button type="button" class="btn btn-sm btn-outline-secondary" disabled>좋아요 '.$data["interests_received"].'</button>  ';
+      }
 
-      echo '<button type="button" class="btn btn-sm '.($interested ? "btn-primary" : "btn-outline-secondary").' interest-button" data-no="'.$data["no"].'">좋아요 '.$data["interests_received"].'</button>  ';
-      echo '<button type="button" class="btn btn-sm btn-outline-info request-button" data-toggle="modal" data-target="#requestModal" data-name="'.$userName.'" data-no="'.$data["no"].'">안녕하세요</button>';
       echo '</div>';
      //echo '</div>';
 
