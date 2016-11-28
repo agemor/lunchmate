@@ -54,7 +54,7 @@ $requests = $module->db->in("lunchmate_requests")
         <?php
 
         $receivedTag = '<span class="tag tag-primary tag-pill">받은 요청</span>';
-        $sentTag = '<span class="tag tag-default tag-pill">보낸 요청</span>';
+        $sentTag = '<span class="tag tag-primary tag-pill">보낸 요청</span>';
         $closedTag = '<span class="tag tag-default tag-pill">완료된 요청</span>';
 
         echo '<div class="list-group m-b-3">';
@@ -69,7 +69,7 @@ $requests = $module->db->in("lunchmate_requests")
           if ($request["sender_id"] == getUserId()) {
             $targetUserId = $request["recipient_id"];
             $displayTag = $request["status"] == "0" ? $sentTag : $closedTag;
-          } 
+          }
 
           // 내가 받은사람일경우
           else {
@@ -91,19 +91,19 @@ $requests = $module->db->in("lunchmate_requests")
           $targetUserName = (mb_substr(base64_decode($targetUser["name_korean"]), 1, 10, "utf-8"));
 
           echo '<a href="#" class="list-group-item list-group-item-action requestList"
-                data-schedule="'   .$request["schedule"].'" 
-                data-status="'     .$request["status"].'" 
-                data-message="'    .base64_decode($request["message"]).'" 
-                data-mine="'       .($request["sender_id"] == getUserId()).'" 
-                data-name="'       .$targetUserName.'" 
-                data-affiliation="'.$targetUser["affiliation"].'" 
-                data-content="'    .$targetUser["content"].'" 
-                data-interests="'  .$targetUser["interests_received"].'" 
-                data-warnings="'   .$targetUser["warnings_received"].'" 
+                data-schedule="'   .$request["schedule"].'"
+                data-status="'     .$request["status"].'"
+                data-message="'    .base64_decode($request["message"]).'"
+                data-mine="'       .($request["sender_id"] == getUserId()).'"
+                data-name="'       .$targetUserName.'"
+                data-affiliation="'.$targetUser["affiliation"].'"
+                data-content="'    .$targetUser["content"].'"
+                data-interests="'  .$targetUser["interests_received"].'"
+                data-warnings="'   .$targetUser["warnings_received"].'"
                 data-no="'         .$targetUser["no"].'">';
           echo '<p class="list-group-item-heading">';
           echo $displayTag;
-                             
+
           // 이름 보여주기
           echo '  <strong>'.$targetUserName.'</strong>#'.$targetUser["no"].'';
 
@@ -136,7 +136,7 @@ $requests = $module->db->in("lunchmate_requests")
           echo '</p>';
 
           // 메시지 보여주기
-          echo '<p class="list-group-item-text text-muted">'.base64_decode($request["message"]).'</p>';
+          echo '<p class="list-group-item-text">'.base64_decode($request["message"]).'</p>';
           echo '</a>';
         }
 
@@ -147,9 +147,19 @@ $requests = $module->db->in("lunchmate_requests")
         </div>
         <div class="col-lg-6">
           <div class="card">
+
+
             <div class="card-block">
               <h4 ><a href="#" class="request-title-text">ㄱㅎㅈ#1225</a>님의 만남 요청</h4>
               <p class="request-message-text">저랑 함께 재밌는 공연 보러 가실래요? 이번에 재밌는거 한대요!</p>
+              <a class="m-b-2 pull-xs-right" data-toggle="collapse" href="#namecard" aria-expanded="false" aria-controls="namecard">자기소개 보기 ...
+              </a><br><br>
+              <div class="collapse" id="namecard">
+                <div class="card card-block m-b-2">
+                  Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+                </div>
+              </div>
+
               <button type="button" class="btn btn-secondary">수락하기</button>
               <button type="button" class="btn btn-link">거절하기</button>
               <?php
@@ -161,7 +171,7 @@ $requests = $module->db->in("lunchmate_requests")
       </div>
       <script type="text/javascript">
         // 유저 로드해서 띄워주기
-        // 
+        //
 
         $(".requestList").click(function() {
           var requestData = {
@@ -176,6 +186,8 @@ $requests = $module->db->in("lunchmate_requests")
             "message": $(this).data("message"),
             "schedule": $(this).data("schedule")
           }
+          $(".requestList").removeClass("active");
+          $(this).addClass("active");
           viewRequest(requestData);
         });
 
