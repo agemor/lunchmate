@@ -87,7 +87,7 @@ if ($_POST["action"] == "request") {
 }
 
 
-else if ($_POST["action"] == "accept") {
+else if ($_POST["action"] == "accept" || $_POST["action"] == "cancel") {
 
   // 변수 체크
   $sentRequest = $module->db->in("lunchmate_requests")
@@ -106,42 +106,57 @@ else if ($_POST["action"] == "accept") {
   assertc(isset($_POST["schedule"]), '{"response": false, "message": "not-enough-parameters"}');
   assertc(isset($_POST["message"]), '{"response": false, "message": "not-enough-parameters"}');
 
-  // 요청 업데이트
-  $response = $module->db->in('lunchmate_requests')
-                         ->insert('final_schedule', $_POST["schedule"])
-                         ->insert('status', "1")
-                         ->where("no", "=", $sentRequest["no"])
-                         ->go();
-  assertc($response, '{"response": false, "message": "cannot-update-record"}');
+  // 수락
+  if ($_POST["action"] == "accept") {
+    // 요청 업데이트
+    $response = $module->db->in('lunchmate_requests')
+                           ->insert('final_schedule', $_POST["schedule"])
+                           ->insert('status', "1")
+                           ->where("no", "=", $sentRequest["no"])
+                           ->go();
+    assertc($response, '{"response": false, "message": "cannot-update-record"}');
 
-  // 요일 라벨
-  $time = new DateTime($sentRequest["timestamp"], new DateTimeZone('Asia/Seoul'));
-  $date->modify('+'.(intval($_POST["schedule"]) % 4).' day');
+    // 요일 라벨
+    $time = new DateTime($sentRequest["timestamp"], new DateTimeZone('Asia/Seoul'));
+    $date->modify('+'.(intval($_POST["schedule"]) % 4).' day');
 
-  $dayLabel = $widget->timetable->getDayLabel(intval($date->format("w")));
+    $dayLabel = $widget->timetable->getDayLabel(intval($date->format("w")));
 
-  // 시간 라벨
-  $timeLabel = $widget->timetable->getTimeLabel(intval($_POST["schedule"]));
+    // 시간 라벨
+    $timeLabel = $widget->timetable->getTimeLabel(intval($_POST["schedule"]));
 
-  // 알림 보내기
-  $content = "님과 ".$dayLabel."요일 ". $timeLabel." 라온샘 입구";
+    // 알림 보내기
+    $content = "님과 ".$dayLabel."요일 ". $timeLabel." 라온샘 입구";
 
-  // 프로필 알림 설정 보고, sms 전송
-  if (intval($sender["alarm_settings"]) % 7 == 0) {
-    $name = (mb_substr(base64_decode($recipient["name_korean"]), 1, 10, "utf-8")) . "#" . $recipient["no"];
-    $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $sender["phone_number"])]);
-  }
+    // 프로필 알림 설정 보고, sms 전송
+    if (intval($sender["alarm_settings"]) % 7 == 0) {
+      $name = (mb_substr(base64_decode($recipient["name_korean"]), 1, 10, "utf-8")) . "#" . $recipient["no"];
+      $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $sender["phone_number"])]);
+    }
 
-  if (intval($recipient["alarm_settings"]) % 7 == 0) {
-    $name = (mb_substr(base64_decode($sender["name_korean"]), 1, 10, "utf-8"))  . "#" . $sender["no"];
-    $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $recipient["phone_number"])]);
+    if (intval($recipient["alarm_settings"]) % 7 == 0) {
+      $name = (mb_substr(base64_decode($sender["name_korean"]), 1, 10, "utf-8"))  . "#" . $sender["no"];
+      $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $recipient["phone_number"])]);
+    }
+  } 
+
+  // 거절
+  else {
+    // 요청 업데이트
+    $response = $module->db->in('lunchmate_requests')
+                           ->insert('final_schedule', $_POST["schedule"])
+                           ->insert('status', "2")
+                           ->where("no", "=", $sentRequest["no"])
+                           ->go();
+    assertc($response, '{"response": false, "message": "cannot-update-record"}');
+
+    $content = "님이 요청을 거절하셨습니다.";
+    if (intval($sender["alarm_settings"]) % 7 == 0) {
+      $name = (mb_substr(base64_decode($recipient["name_korean"]), 1, 10, "utf-8")) . "#" . $recipient["no"];
+      $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $sender["phone_number"])]);
+    }
   }
 }
-
-
-
-
-
 
 
 echo '{"response": true}';

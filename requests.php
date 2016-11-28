@@ -214,6 +214,11 @@ $requests = $module->db->in("lunchmate_requests")
           viewRequest(requestData);
         });
 
+        $(".request-cancel-button").click(function() {
+          var selectedNo = $(this).data("no");
+          sendRequest(selectedNo, 0, "cancel");
+        });
+
         $(".request-accept-button").click(function() {
 
           var selectedNo = $(this).data("no");
@@ -228,21 +233,20 @@ $requests = $module->db->in("lunchmate_requests")
                   }
               });
           });
-          sendRequest(selectedNo, selectedScheduleIndex, true);
+          sendRequest(selectedNo, selectedScheduleIndex, "accept");
         });
 
-        function sendRequest(no, scheduleIndex, accept) {
+        function sendRequest(no, scheduleIndex, action) {
           var httpRequest = new XMLHttpRequest();
           var formData  = new FormData();
-          formData.append("action", "accept");
+          formData.append("action", action);
           formData.append("target_no", no);
-          formData.append("accept", accept);
           formData.append("schedule", scheduleIndex);
 
           httpRequest.addEventListener('load', function(event) {
             var result = JSON.parse(httpRequest.responseText);
             if (result.response) {
-              showMessage(accept ? "요청을 수락했습니다." : "요청을 거절했습니다.");
+              showMessage(action == "accept" ? "요청을 수락했습니다." : "요청을 거절했습니다.");
             } else {
                showMessage("요청 처리에 실패했습니다.");
             }
