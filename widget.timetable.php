@@ -83,6 +83,14 @@ $widget->{"timetable"} = new class {
             "hour" => intval($this->time->format("H")) * 2 + (intval($this->time->format("i")) / 60));
     }
 
+    public function getTimeLabel($index) {
+        return self::TIMES[intval($index / 4)];
+    }
+
+    public function getDayLabel($index) {
+        return self::DAYS[$index];
+    }
+
 }
 
 ?>

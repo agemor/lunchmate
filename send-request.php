@@ -2,6 +2,7 @@
 include "session.php";
 include "module.db.php";
 include "module.sms.php";
+include "widget.timetable.php";
 
 // 기본적인 assert 함수
 function assertc($condition, $text) {
@@ -14,6 +15,9 @@ function assertc($condition, $text) {
 // 로그인 체크
 assertc(assigned(), '{"response": false, "message": "signin-required"}');
 
+// 액션 체크
+assertc(isset($_POST["action"]), '{"response": false, "message": "no-action"}');
+
 // 기여자 로드
 $sender = $module->db->in("lunchmate_users")
                  ->select("no")
@@ -23,6 +27,7 @@ $sender = $module->db->in("lunchmate_users")
                  ->where("student_id", "=", getUserId())
                  ->goAndGet();
 assertc($sender, '{"response": false, "message": "cannot-load-sender"}');
+
 
 // 수혜자 로드
 $useTargetNo = false;
@@ -45,36 +50,99 @@ assertc($recipient, '{"response": false, "message": "cannot-load-recipient"}');
 // 자기 자신에 대한 수혜는 금지
 assertc($recipient["no"] != $sender["no"], '{"response": false, "message": "self"}');
 
-
 // 데이터 체크 후, 수락, 삭제 등도 여기서 구현
+if ($_POST["action"] == "request") {
 
+  // 해당자에게 기존에 pending 중인 요청이 있는지 체크. 있으면 취소 후 다시 보내야 함
+  $sentRequest = $module->db->in("lunchmate_requests")
+                   ->select("status")
+                   ->where("sender_id", "=", getUserId())
+                   ->where("recipient_id", "=", $recipient["student_id"])
+                   ->goAndGet();
+  if ($sentRequest) {
+    assertc($sentRequest["status"] != "0", '{"response": false, "message": "duplicate-request"}');
+  }
 
-// 해당자에게 기존에 pending 중인 요청이 있는지 체크. 있으면 취소 후 다시 보내야 함
-$sentRequest = $module->db->in("lunchmate_requests")
-                 ->select("status")
-                 ->where("sender_id", "=", getUserId())
-                 ->where("recipient_id", "=", $recipient["student_id"])
-                 ->goAndGet();
-if ($sentRequest) {
-  assertc($sentRequest["status"] != "0", '{"response": false, "message": "duplicate-request"}');
+  // 파라미터 체크
+  assertc(isset($_POST["schedule"]), '{"response": false, "message": "not-enough-parameters"}');
+  assertc(isset($_POST["message"]), '{"response": false, "message": "not-enough-parameters"}');
+
+  // 요청 등록
+  $response = $module->db->in('lunchmate_requests')
+                         ->insert('sender_id', getUserId())
+                         ->insert('recipient_id', $recipient["student_id"])
+                         ->insert('message', base64_encode(strip_tags($_POST["message"])))
+                         ->insert('schedule', $_POST["schedule"])
+                         ->insert('final_schedule', "")
+                         ->insert('status', "0")
+                         ->go();
+  assertc($response, '{"response": false, "message": "cannot-insert-record"}');
+
+  // 알림 보내기
+  if (intval($recipient["alarm_settings"]) % 7 == 0) {
+    $content = "님으로부터 만남 요청이 들어왔습니다. 지금 확인해 보세요!";
+    $name = (mb_substr(base64_decode($sender["name_korean"]), 1, 10, "utf-8"))  . "#" . $sender["no"];
+    $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $recipient["phone_number"])]);
+  }
 }
-// 요청 등록
-$response = $module->db->in('lunchmate_requests')
-                       ->insert('sender_id', getUserId())
-                       ->insert('recipient_id', $recipient["student_id"])
-                       ->insert('message', base64_encode(strip_tags($_POST["message"])))
-                       ->insert('schedule', $_POST["schedule"])
-                       ->insert('final_schedule', "")
-                       ->insert('status', "0")
-                       ->go();
-assertc($response, '{"response": false, "message": "cannot-insert-record"}');
 
-// 알림 보내기
-if (intval($recipient["alarm_settings"]) % 7 == 0) {
-  $content = "님으로부터 만남 요청이 들어왔습니다. 지금 확인해 보세요!";
-  $name = (mb_substr(base64_decode($sender["name_korean"]), 1, 10, "utf-8"))  . "#" . $sender["no"];
-  $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $recipient["phone_number"])]);
+
+else if ($_POST["action"] == "accept") {
+
+  // 변수 체크
+  $sentRequest = $module->db->in("lunchmate_requests")
+                   ->select("status")
+                   ->select("no")
+                   ->select("timestamp")
+                   ->where("sender_id", "=", getUserId())
+                   ->where("recipient_id", "=", $recipient["student_id"])
+                   ->goAndGet();
+
+  // 해당자에게 기존에 pending 중인 요청이 있는지 체크. 있어야 추후 진행 가능.
+  assertc($sentRequest, '{"response": false, "message": "no-avaliable-request"}');
+  assertc($sentRequest["status"] == "0", '{"response": false, "message": "no-avaliable-request"}');
+
+  // 파라미터 체크
+  assertc(isset($_POST["schedule"]), '{"response": false, "message": "not-enough-parameters"}');
+  assertc(isset($_POST["message"]), '{"response": false, "message": "not-enough-parameters"}');
+
+  // 요청 업데이트
+  $response = $module->db->in('lunchmate_requests')
+                         ->insert('final_schedule', $_POST["schedule"])
+                         ->insert('status', "1")
+                         ->where("no", "=", $sentRequest["no"])
+                         ->go();
+  assertc($response, '{"response": false, "message": "cannot-update-record"}');
+
+  // 요일 라벨
+  $time = new DateTime($sentRequest["timestamp"], new DateTimeZone('Asia/Seoul'));
+  $date->modify('+'.(intval($_POST["schedule"]) % 4).' day');
+
+  $dayLabel = $widget->timetable->getDayLabel(intval($date->format("w")));
+
+  // 시간 라벨
+  $timeLabel = $widget->timetable->getTimeLabel(intval($_POST["schedule"]));
+
+  // 알림 보내기
+  $content = "님과 ".$dayLabel."요일 ". $timeLabel." 라온샘 입구";
+
+  // 프로필 알림 설정 보고, sms 전송
+  if (intval($sender["alarm_settings"]) % 7 == 0) {
+    $name = (mb_substr(base64_decode($recipient["name_korean"]), 1, 10, "utf-8")) . "#" . $recipient["no"];
+    $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $sender["phone_number"])]);
+  }
+
+  if (intval($recipient["alarm_settings"]) % 7 == 0) {
+    $name = (mb_substr(base64_decode($sender["name_korean"]), 1, 10, "utf-8"))  . "#" . $sender["no"];
+    $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $recipient["phone_number"])]);
+  }
 }
+
+
+
+
+
+
 
 echo '{"response": true}';
 

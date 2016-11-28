@@ -225,6 +225,7 @@ if(assigned()) {
   function sendRequest(targetNo, message, schedule) {
     var httpRequest = new XMLHttpRequest();
     var formData  = new FormData();
+    formData.append("action", "request");
     formData.append("target_no", targetNo);
     formData.append("message", message);
     formData.append("schedule", schedule);

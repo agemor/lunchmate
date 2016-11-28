@@ -25,8 +25,6 @@ $requests = $module->db->in("lunchmate_requests")
                       ->where("sender_id", "=", getUserId())
                       ->limit("20")
                       ->goAndGetAll();
-
-
 ?>
 <!DOCTYPE html>
 <html lang="ko">
@@ -90,14 +88,47 @@ $requests = $module->db->in("lunchmate_requests")
                              ->goAndGet();
           $targetUserName = (mb_substr(base64_decode($targetUser["name_korean"]), 1, 10, "utf-8"));
 
+          
+
+          // 날짜에 맞게 스케줄 처리
+          // 받은 시간 보여주기
+          $now = new DateTime();
+          $now->setTimezone(new DateTimeZone('Asia/Seoul'));
+          $then = new DateTime($request["timestamp"], new DateTimeZone('Asia/Seoul'));
+          $interval = $now->diff($then);
+
+          // 날짜가 다르면, 스케줄 시프팅
+          $schedules = $request["schedule"];
+          if ($interval->d > 0) {
+            $newScheduleList = array();
+            $scheduleList = explode(",", $request["schedule"]);
+
+            for ($i = 0; $i < count($scheduleList); $i++) {
+              array_push($newScheduleList, intval($scheduleList[$i]));
+            }
+
+            $i = $interval->d;
+            while (--$i >= 0) {
+              $buffer = array();
+              for ($j = 0; $j < count($newScheduleList); $j++) {
+                $val = $newScheduleList[$j];
+                if ($val % 4 != 0 && $val > 0) {
+                  array_push($buffer, $val - 1);
+                }
+              }
+              $newScheduleList = $buffer;
+            }
+            $schedules = implode(",", $newScheduleList);
+          }
+
           echo '<a href="#" class="list-group-item list-group-item-action requestList"
-                data-schedule="'   .$request["schedule"].'"
+                data-schedule="'   .$schedules.'"
                 data-status="'     .$request["status"].'"
                 data-message="'    .base64_decode($request["message"]).'"
                 data-mine="'       .($request["sender_id"] == getUserId()).'"
                 data-name="'       .$targetUserName.'"
-                data-affiliation="'.$targetUser["affiliation"].'"
-                data-content="'    .$targetUser["content"].'"
+                data-affiliation="'.base64_decode($targetUser["affiliation"]).'"
+                data-content="'    .base64_decode($targetUser["content"]).'"
                 data-interests="'  .$targetUser["interests_received"].'"
                 data-warnings="'   .$targetUser["warnings_received"].'"
                 data-no="'         .$targetUser["no"].'">';
@@ -106,12 +137,6 @@ $requests = $module->db->in("lunchmate_requests")
 
           // 이름 보여주기
           echo '  <strong>'.$targetUserName.'</strong>#'.$targetUser["no"].'';
-
-          // 받은 시간 보여주기
-          $now = new DateTime();
-          $now->setTimezone(new DateTimeZone('Asia/Seoul'));
-          $then = new DateTime($request["timestamp"], new DateTimeZone('Asia/Seoul'));
-          $interval = $now->diff($then);
 
           // 하루 범위 안 - 몇시간 전
           if ($interval->days < 1) {
@@ -147,21 +172,20 @@ $requests = $module->db->in("lunchmate_requests")
         </div>
         <div class="col-lg-6">
           <div class="card">
-
-
             <div class="card-block">
-              <h4 ><a href="#" class="request-title-text">ㄱㅎㅈ#1225</a>님의 만남 요청</h4>
-              <p class="request-message-text">저랑 함께 재밌는 공연 보러 가실래요? 이번에 재밌는거 한대요!</p>
-              <a class="m-b-2 pull-xs-right" data-toggle="collapse" href="#namecard" aria-expanded="false" aria-controls="namecard">자기소개 보기 ...
-              </a><br><br>
+              <h4 ><a class="request-title-text">이름</a>님의 만남 요청</h4>
+              <p class="request-message-text p-y-2">저랑 함께 재밌는 공연 보러 가실래요? 이번에 재밌는거 한대요!</p>
+              <button type="button" class="btn btn-secondary" data-toggle="collapse" href="#namecard" aria-expanded="false" aria-controls="namecard">소개 보기</button>
+              <button type="button" class="btn btn-primary request-accept-button">수락하기</button>
+              <button type="button" class="btn btn-danger request-cancel-button">거절하기</button>
               <div class="collapse" id="namecard">
-                <div class="card card-block m-b-2">
-                  Anim pariatur cliche reprehenderit, enim eiusmod high life accusamus terry richardson ad squid. Nihil anim keffiyeh helvetica, craft beer labore wes anderson cred nesciunt sapiente ea proident.
+                <div class="card m-t-2">
+                  <div class="card-block">
+                    <p class="text-muted user-content-text"></p>
+                    <footer class="blockquote-footer user-affiliation-text"></footer>
+                  </div>
                 </div>
               </div>
-
-              <button type="button" class="btn btn-secondary">수락하기</button>
-              <button type="button" class="btn btn-link">거절하기</button>
               <?php
               echo $widget->timetable->get();
               ?>
@@ -171,7 +195,6 @@ $requests = $module->db->in("lunchmate_requests")
       </div>
       <script type="text/javascript">
         // 유저 로드해서 띄워주기
-        //
 
         $(".requestList").click(function() {
           var requestData = {
@@ -191,10 +214,78 @@ $requests = $module->db->in("lunchmate_requests")
           viewRequest(requestData);
         });
 
+        $(".request-accept-button").click(function() {
+
+          var selectedNo = $(this).data("no");
+          var selectedScheduleIndex = 0;
+
+          // 하이라이트 된 블록 찾기
+          $("#scheduleTable tr").each(function () {
+              $('td', this).each(function () {
+                  var scheduleIndex = $(this).data("index");
+                  if ($(this).hasClass("bg-primary")) {
+                      selectedScheduleIndex = scheduleIndex;
+                  }
+              });
+          });
+          sendRequest(selectedNo, selectedScheduleIndex, true);
+        });
+
+        function sendRequest(no, scheduleIndex, accept) {
+          var httpRequest = new XMLHttpRequest();
+          var formData  = new FormData();
+          formData.append("action", "accept");
+          formData.append("target_no", no);
+          formData.append("accept", accept);
+          formData.append("schedule", scheduleIndex);
+
+          httpRequest.addEventListener('load', function(event) {
+            var result = JSON.parse(httpRequest.responseText);
+            if (result.response) {
+              showMessage(accept ? "요청을 수락했습니다." : "요청을 거절했습니다.");
+            } else {
+               showMessage("요청 처리에 실패했습니다.");
+            }
+          });
+          httpRequest.open('POST', './send-request.php');
+          httpRequest.send(formData);
+        }
+
         function viewRequest(requestData) {
           $(".request-title-text").text(requestData["name"]);
           $(".request-message-text").text(requestData["message"]);
+          $(".user-affiliation-text").text(requestData["affiliation"]);
+          $(".user-content-text").text(requestData["content"]);
+
+          // 체크박스 생성
+          var schedules = requestData["schedule"].split(",");
+
+          $("#scheduleTable tr").each(function () {
+              $('td', this).each(function () {
+                  var scheduleIndex = $(this).data("index") + "";
+                  $(this).removeClass("bg-primary");
+                  if (schedules.indexOf(scheduleIndex) >= 0 && !$(this).hasClass("table-active")) {
+                    $(this).addClass("bg-warning");
+                  } else {
+                    $(this).removeClass("bg-warning");
+                  }
+               });
+          });
         }
+
+        $("#scheduleTable").on("click", "td", function() {
+            $("#scheduleTable tr").each(function () {
+              $('td', this).each(function () {
+                  var scheduleIndex = $(this).data("index") + "";
+                  if ($(this).hasClass("bg-primary")) {
+                    $(this).toggleClass("bg-primary bg-warning");
+                  }
+               });
+            });
+            if(!$(this).hasClass("table-active") && ($(this).hasClass("bg-warning") || $(this).hasClass("bg-primary"))) {
+              $(this).toggleClass("bg-primary bg-warning");
+            }
+         });
 
       </script>
     </main>
