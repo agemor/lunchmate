@@ -58,12 +58,11 @@ $sentRequest = $module->db->in("lunchmate_requests")
 if ($sentRequest) {
   assertc($sentRequest["status"] != "0", '{"response": false, "message": "duplicate-request"}');
 }
-
 // 요청 등록
 $response = $module->db->in('lunchmate_requests')
                        ->insert('sender_id', getUserId())
                        ->insert('recipient_id', $recipient["student_id"])
-                       ->insert('message', strip_tags($_POST["message"]))
+                       ->insert('message', base64_encode(strip_tags($_POST["message"])))
                        ->insert('schedule', $_POST["schedule"])
                        ->insert('final_schedule', "")
                        ->insert('status', "0")

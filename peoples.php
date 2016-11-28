@@ -143,15 +143,16 @@ if(assigned()) {
       echo '<hr>';
       echo '<p>'.base64_decode($data["content"]).'</p>';
 
-      // 이미 interest 준 버튼은 class를 다르게 함
-      $interested = false;
-      foreach ($sentInterests as $sentInterest) {
-          if ($sentInterest['recipient_id'] == $data["student_id"]) {
-            $interested = true;
-            break;
-          }
-      }
+      
       if (assigned()) {
+        // 이미 interest 준 버튼은 class를 다르게 함
+        $interested = false;
+        foreach ($sentInterests as $sentInterest) {
+            if ($sentInterest['recipient_id'] == $data["student_id"]) {
+              $interested = true;
+              break;
+            }
+        }
         echo '<button type="button" class="btn btn-sm '.($interested ? "btn-primary" : "btn-outline-secondary").' interest-button" data-no="'.$data["no"].'">좋아요 '.$data["interests_received"].'</button>  ';
         echo '<button type="button" class="btn btn-sm btn-outline-info request-button" data-toggle="modal" data-target="#requestModal" data-name="'.$userName.'" data-no="'.$data["no"].'">안녕하세요</button>';
       } else {
