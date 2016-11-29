@@ -1,6 +1,6 @@
 <?php
-include "db.php";
 include "session.php";
+include "module.db.php";
 
 $location = "profile.php";
 $success = true;
@@ -18,7 +18,14 @@ if (isset($_POST["setting-type"])) {
   // 알람 옵션 설정
   if ($_POST["setting-type"] == "alarm") {
       $settingsValue = (isset($_POST["mutual-alarm"]) ? 3 : 1) * (isset($_POST["schedule-fix-alarm"]) ? 5 : 1) * 7;
-      $success = tell("UPDATE `lunchmate_users` SET  `alarm_settings`='".$settingsValue."' WHERE `student_id`='".getUserId()."';");
+
+
+      $success = $module->db->in("lunchmate_users")
+                        ->update("alarm_settings", $settingsValue)
+                        ->select("student_id")
+                        ->where("student_id", "=", getUserId())
+                        ->go();
+
       if (!$success) {
         $message = "알림 설정을 업데이트하는데 오류가 발생했습니다.";
       }
@@ -32,7 +39,14 @@ if (isset($_POST["setting-type"])) {
       $success = false;
       $message = "프로필 소개글의 글자 수 제한을 초과하였습니다.";
     } else {
-      $success = tell("UPDATE `lunchmate_users` SET `affiliation`='".$affiliation."', `content`='".$content."' WHERE `student_id`='".getUserId()."';");
+
+      $success = $module->db->in("lunchmate_users")
+                        ->update("affiliation", $affiliation)
+                        ->update("content", $content)
+                        ->select("student_id")
+                        ->where("student_id", "=", getUserId())
+                        ->go();
+
       if (!$success) {
         $message = "프로필을 업데이트하는데 오류가 발생했습니다.";
       }else {
@@ -45,6 +59,11 @@ if (isset($_POST["setting-type"])) {
 
 $response = askOne("SELECT * FROM `lunchmate_users` WHERE `student_id`='".getUserId()."';");
 
+$response = $module->db->in("lunchmate_users")
+                       ->select("*")
+                       ->update("content", $content)
+                       ->where("student_id", "=", getUserId())
+                       ->goAndGet();
 
 //echo($response['phone_number']);
 
