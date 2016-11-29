@@ -19,10 +19,12 @@ $requests = $module->db->in("lunchmate_requests")
                       ->select("message")
                       ->select("schedule")
                       ->select("final_schedule")
+                      ->select("location")
                       ->select("status")
                       ->select("timestamp")
                       ->where("recipient_id", "=", getUserId(), "OR")
                       ->where("sender_id", "=", getUserId())
+                      ->orderBy("`timestamp` DESC")
                       ->limit("20")
                       ->goAndGetAll();
 ?>
@@ -54,6 +56,7 @@ $requests = $module->db->in("lunchmate_requests")
         $receivedTag = '<span class="tag tag-primary tag-pill">받은 요청</span>';
         $sentTag = '<span class="tag tag-primary tag-pill">보낸 요청</span>';
         $closedTag = '<span class="tag tag-default tag-pill">완료된 요청</span>';
+        $canceledTag = '<span class="tag tag-default tag-pill">닫힌 요청</span>';
 
         echo '<div class="list-group m-b-3">';
 
@@ -63,16 +66,29 @@ $requests = $module->db->in("lunchmate_requests")
 
         foreach ($requests as $request) {
 
+
+
           // 내가 보낸사람일경우
           if ($request["sender_id"] == getUserId()) {
             $targetUserId = $request["recipient_id"];
-            $displayTag = $request["status"] == "0" ? $sentTag : $closedTag;
           }
 
           // 내가 받은사람일경우
           else {
             $targetUserId = $request["sender_id"];
-            $displayTag = $request["status"] == "0" ? $receivedTag : $closedTag;
+          }
+
+          // 태그 설정
+          if ($request["status"] == "0") {
+            if ($request["sender_id"] == getUserId()) {
+              $displayTag = $sentTag;
+            } else {
+              $displayTag = $receivedTag;
+            }
+          } else if ($request["status"] == "1") {
+            $displayTag = $closedTag;
+          } else if ($request["status"] == "2") {
+            $displayTag = $canceledTag;
           }
 
           // 이름 읽어오기
@@ -123,6 +139,8 @@ $requests = $module->db->in("lunchmate_requests")
 
           echo '<a href="#" class="list-group-item list-group-item-action requestList"
                 data-schedule="'   .$schedules.'"
+                data-request-no="' .$request["no"].'"
+                data-location="'   .$request["location"].'"
                 data-status="'     .$request["status"].'"
                 data-message="'    .base64_decode($request["message"]).'"
                 data-mine="'       .($request["sender_id"] == getUserId()).'"
@@ -172,12 +190,17 @@ $requests = $module->db->in("lunchmate_requests")
         </div>
         <div class="col-lg-6">
           <div class="card">
-            <div class="card-block">
-              <h4 ><a class="request-title-text">이름</a>님의 만남 요청</h4>
+            <div class="card-block request-card">
+              <a class="request-no-text" hidden></a>
+              <h4 ><a class="request-name-text">이름</a>#<a class="request-target-no-text"></a><a class="request-title-text">님의 만남 요청</a></h4>
               <p class="request-message-text p-y-2">저랑 함께 재밌는 공연 보러 가실래요? 이번에 재밌는거 한대요!</p>
+
+              <strong><p class="request-location-text">시간과 장소는 문자메시지를 참조해 주세요.</p></strong>
+
               <button type="button" class="btn btn-secondary" data-toggle="collapse" href="#namecard" aria-expanded="false" aria-controls="namecard">소개 보기</button>
               <button type="button" class="btn btn-primary request-accept-button">수락하기</button>
-              <button type="button" class="btn btn-danger request-cancel-button">거절하기</button>
+              <button type="button" class="btn btn-danger request-decline-button">거절하기</button>
+              <button type="button" class="btn btn-danger request-cancel-button">취소하기</button>
               <div class="collapse" id="namecard">
                 <div class="card m-t-2">
                   <div class="card-block">
@@ -186,19 +209,25 @@ $requests = $module->db->in("lunchmate_requests")
                   </div>
                 </div>
               </div>
+
               <?php
               echo $widget->timetable->get();
               ?>
+            </div>
+            <div class="card-block default-card">
+              <p class="text-xs-center p-y-2"> 선택된 요청이 없습니다 </p>
             </div>
           </div>
         </div>
       </div>
       <script type="text/javascript">
         // 유저 로드해서 띄워주기
-
+        $(".default-card").show();
+        $(".request-card").hide();
         $(".requestList").click(function() {
           var requestData = {
             "no": $(this).data("no"),
+            "request-no": $(this).data("request-no"),
             "name": $(this).data("name"),
             "status": $(this).data("status"),
             "mine": $(this).data("mine"),
@@ -214,15 +243,27 @@ $requests = $module->db->in("lunchmate_requests")
           viewRequest(requestData);
         });
 
+        $(".request-decline-button").click(function() {
+          var selectedNo = $(".request-target-no-text").text();
+          $(".request-decline-button").text("처리 중...");
+          sendRequest(selectedNo, 0, "decline", function() {
+              $(".request-decline-button").text("거절하기");
+          });
+        });
+
         $(".request-cancel-button").click(function() {
-          var selectedNo = $(this).data("no");
-          sendRequest(selectedNo, 0, "cancel");
+          var selectedNo = $(".request-target-no-text").text();
+          var requestNo = $(".request-no-text").text();
+          $(".request-cancel-button").text("처리 중...");
+          sendRequest(selectedNo, 0, "cancel", function() {
+              $(".request-cancel-button").text("취소하기");
+          },requestNo);
         });
 
         $(".request-accept-button").click(function() {
 
-          var selectedNo = $(this).data("no");
-          var selectedScheduleIndex = 0;
+          var selectedNo = $(".request-target-no-text").text();
+          var selectedScheduleIndex = -1;
 
           // 하이라이트 된 블록 찾기
           $("#scheduleTable tr").each(function () {
@@ -233,37 +274,93 @@ $requests = $module->db->in("lunchmate_requests")
                   }
               });
           });
-          sendRequest(selectedNo, selectedScheduleIndex, "accept");
+
+          if (selectedScheduleIndex >= 0) {
+            $(".request-accept-button").text("처리 중...");
+            sendRequest(selectedNo, selectedScheduleIndex, "accept", function() {
+                $(".request-cancel-button").text("수락하기");
+            });
+          }
         });
 
-        function sendRequest(no, scheduleIndex, action) {
+        function sendRequest(no, scheduleIndex, action, callback, requestNo) {
           var httpRequest = new XMLHttpRequest();
           var formData  = new FormData();
           formData.append("action", action);
           formData.append("target_no", no);
           formData.append("schedule", scheduleIndex);
+          formData.append("request_no", requestNo);
 
           httpRequest.addEventListener('load', function(event) {
+            console.log(httpRequest.responseText);
             var result = JSON.parse(httpRequest.responseText);
             if (result.response) {
-              showMessage(action == "accept" ? "요청을 수락했습니다." : "요청을 거절했습니다.");
+              alert(action == "accept" ? "요청을 수락했습니다." : "요청을 취소했습니다.");
+              window.location.reload();
             } else {
+              
                showMessage("요청 처리에 실패했습니다.");
             }
+            callback();
           });
           httpRequest.open('POST', './send-request.php');
           httpRequest.send(formData);
         }
 
         function viewRequest(requestData) {
-          $(".request-title-text").text(requestData["name"]);
+          $(".default-card").hide();
+          $(".request-card").show();
+
+          $(".request-name-text").text(requestData["name"]);
+          $(".request-target-no-text").text(requestData["no"]);
+          $(".request-no-text").text(requestData["request-no"]);
           $(".request-message-text").text(requestData["message"]);
           $(".user-affiliation-text").text(requestData["affiliation"]);
           $(".user-content-text").text(requestData["content"]);
 
-          // 체크박스 생성
-          var schedules = requestData["schedule"].split(",");
+          if (requestData["mine"] == 1) {
+            $(".request-decline-button").hide();
+            $(".request-accept-button").hide();
+            if (requestData["status"] == "2") {
+              $(".request-cancel-button").hide();
+            } else {
+              $(".request-cancel-button").show();
+            }
+            $(".request-title-text").text("님에게 보낸 요청");
+          } else {
+            if (requestData["status"] == "0") {
+              $(".request-decline-button").show();
+              $(".request-accept-button").show();
+              $(".request-cancel-button").hide();
+            } else {
+              $(".request-decline-button").hide();
+              $(".request-accept-button").hide();
+              if (requestData["status"] == "2") {
+                $(".request-cancel-button").hide();
+              } else {
+                $(".request-cancel-button").show();
+              }
+              
+            }
+            $(".request-title-text").text("님께서 보낸 요청");
+          }
 
+          if (requestData["status"] == "0") {
+            $("#scheduleTable").show();
+            $(".request-location-text").hide();
+          } else if (requestData["status"] == "1"){
+            $(".request-location-text").show();
+            $("#scheduleTable").hide();
+          } else {
+            $(".request-location-text").hide();
+            $("#scheduleTable").hide();
+          }
+
+          // 체크박스 생성
+          var schedules = [];
+          if (requestData["schedule"] != undefined) {
+            schedules = (requestData["schedule"] + "").split(",");
+          }
           $("#scheduleTable tr").each(function () {
               $('td', this).each(function () {
                   var scheduleIndex = $(this).data("index") + "";

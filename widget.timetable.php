@@ -84,7 +84,18 @@ $widget->{"timetable"} = new class {
     }
 
     public function getTimeLabel($index) {
-        return self::TIMES[intval($index / 4)];
+
+        $keys = array_keys(self::TIMES);
+
+        return self::TIMES[$keys[intval($index / 4)]];
+
+        /*for ($i = 0; $i < count(self::TIMES); $i++) {
+            if ($i == intval($index / 4)) {
+                return self::TIMES[$i];
+            }
+        }*/
+
+        //return self::TIMES[intval($index / 4)];
     }
 
     public function getDayLabel($index) {
