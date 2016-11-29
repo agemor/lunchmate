@@ -60,7 +60,6 @@ if(assigned()) {
                      ->where("sender_id", "=", getUserId())
                      ->goAndGetAll();
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -191,16 +190,21 @@ if(assigned()) {
       } else {
         echo '<button type="button" class="btn btn-sm btn-outline-secondary" disabled>좋아요 '.$data["interests_received"].'</button>  ';
       }
-
       echo '</div>';
-     //echo '</div>';
-
   }
 
   echo '</div>';
 
 ?>
 <script type="text/javascript">
+
+  <?php
+    if (assigned()) {
+          if(strlen($me["content"]) < 5 ) {
+              echo 'showMessage("프로필 내용이 부족합니다. 조금 더 채워 주세요!");';
+          }
+      }
+  ?>
 
   $(".request-button").click(function(event) {
     setRequestModal($(this).data("name"), $(this).data("no"));
