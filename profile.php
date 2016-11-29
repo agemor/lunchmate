@@ -57,11 +57,8 @@ if (isset($_POST["setting-type"])) {
 
 }
 
-$response = askOne("SELECT * FROM `lunchmate_users` WHERE `student_id`='".getUserId()."';");
-
 $response = $module->db->in("lunchmate_users")
                        ->select("*")
-                       ->update("content", $content)
                        ->where("student_id", "=", getUserId())
                        ->goAndGet();
 
