@@ -113,7 +113,7 @@ $response = $module->db->in("lunchmate_users")
                   </div>
                   <div class="form-group">
                     <label for="profileMessage">소개글</label>
-                    <textarea maxlength="200" class="form-control" rows="14" id="profileMessage" name="profile-content" placeholder="자신에 대해 소개해 주세요. (최대 200자)"><?php echo($response['content']);?></textarea>
+                    <textarea maxlength="200" class="form-control" rows="14" id="profileMessage" name="profile-content" placeholder="자신에 대해 소개해 주세요. (최대 200자) 예시: 연세독수리 한화이글스~ 안녕하세요! 한화팬분들 없으신가요? 같은 연세대 한화팬으로서 같이 톡도 파서 팀 얘기도 하고, 시즌이 되면 같이 직관도 보러가면 어떨까요? 밤에 같이 치킨먹으면서 야구얘기해도 재밌을것 같아요! 한화라서 행복합니다."><?php echo($response['content']);?></textarea>
                     <small class="form-text text-muted">상대방을 불쾌하게 하는 소개글은 차단될 수 있습니다.</small>
 
                   </div>
