@@ -5,16 +5,48 @@ include "module.sms.php";
 
 $location = "peoples.php";
 
-$peoples = $module->db->in("lunchmate_users")
+// 키워드가 있으면
+function fetchAll() {
+  global $module;
+  return $module->db->in("lunchmate_users")
+                        ->select("no")
+                        ->select("student_id")
+                        ->select("name_korean")
+                        ->select("affiliation")
+                        ->select("content")
+                        ->select("interests_received")
+                        ->orderBy("RAND()")
+                        ->limit("20")
+                        ->goAndGetAll();
+}
+
+function fetchKeyword($rawKeywords) {
+  global $module;
+  $keywords = explode(" ", $rawKeywords);
+  $query = $module->db->in("lunchmate_users")
                       ->select("no")
                       ->select("student_id")
                       ->select("name_korean")
                       ->select("affiliation")
                       ->select("content")
-                      ->select("interests_received")
-                      ->orderBy("RAND()")
-                      ->limit("20")
-                      ->goAndGetAll();
+                      ->select("interests_received");
+
+  for ($i = 0; $i < count($keywords); $i++) {
+      if (strlen($keywords[$i]) < 2) {
+          continue;
+      }
+      $query = $query->where("name_korean", "LIKE", "%".$keywords[$i]."%", "OR")
+                     ->where("affiliation", "LIKE", "%".$keywords[$i]."%", "OR")
+                     ->where("content", "LIKE", "%".$keywords[$i]."%", "OR");
+  }
+  $result = $query->limit("20")
+                  ->orderBy("RAND()")
+                  ->goAndGetAll();
+  return $result;
+}
+
+$peoples = isset($_GET["keyword"]) ? fetchKeyword($_GET["keyword"]) : fetchAll();
+
 
 // 내 프로필
 if(assigned()) {
@@ -57,13 +89,14 @@ if(assigned()) {
 </style>
 
 <div class="container">
-
-<div class="input-group input-group-lg m-y-2">
-      <input type="text" class="form-control" placeholder="검색 키워드">
-      <span class="input-group-btn">
-        <button class="btn btn-secondary" type="button">찾기</button>
-      </span>
-    </div>
+<form action="./peoples.php" method="get">
+  <div class="input-group input-group-lg m-y-2">
+    <input type="text" class="form-control" name="keyword" placeholder="검색 키워드" value="<?php echo $_GET["keyword"];?>">
+    <span class="input-group-btn">
+        <button type="submit" class="btn btn-secondary" type="button">찾기</button>
+    </span>
+  </div>
+</form>
 
 <div class="alert alert-info alert-dismissible fade in" role="alert">
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -143,7 +176,7 @@ if(assigned()) {
       echo '<hr>';
       echo '<p>'.$data["content"].'</p>';
 
-      
+
       if (assigned()) {
         // 이미 interest 준 버튼은 class를 다르게 함
         $interested = false;

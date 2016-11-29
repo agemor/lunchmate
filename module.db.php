@@ -114,7 +114,7 @@ $module->{"db"} = new class {
         // 응답 반환
         if ($result->num_rows > 0) {
             return $result->fetch_assoc();
-        } 
+        }
         return null;
     }
 
