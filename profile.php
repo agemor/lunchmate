@@ -22,7 +22,6 @@ if (isset($_POST["setting-type"])) {
 
       $success = $module->db->in("lunchmate_users")
                         ->update("alarm_settings", $settingsValue)
-                        ->select("student_id")
                         ->where("student_id", "=", getUserId())
                         ->go();
 
@@ -43,7 +42,6 @@ if (isset($_POST["setting-type"])) {
       $success = $module->db->in("lunchmate_users")
                         ->update("affiliation", $affiliation)
                         ->update("content", $content)
-                        ->select("student_id")
                         ->where("student_id", "=", getUserId())
                         ->go();
 
