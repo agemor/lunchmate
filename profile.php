@@ -170,7 +170,7 @@ $response = askOne("SELECT * FROM `lunchmate_users` WHERE `student_id`='".getUse
                   <span class="custom-control-indicator"></span>
                   <span class="custom-control-description">스케줄 확인 알림</span>
                   </label>
-                  <button type="button" class="btn btn-secondary pull-xs-right" disabled>비활성화하기</button>
+                  <button type="button" class="btn btn-secondary pull-xs-right" disabled>모든 정보 삭제하기 (탈퇴)</button>
                 </form>
               </div>
             </div>

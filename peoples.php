@@ -102,7 +102,7 @@ if(assigned()) {
   <button type="button" class="close" data-dismiss="alert" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
-  <strong>Lunchmate에 처음이신가요?</strong> 여기서 서비스 이용에 관한 사항을 숙지하세요.
+  <strong>검색하지 않을 경우 무작위로 20명의 정보가 보여집니다.</strong> 새로고침하면 다시 불러옵니다.
 </div>
 <style type="text/css">
 

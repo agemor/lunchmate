@@ -8,14 +8,13 @@
         <li class="nav-item <?php if($location == "peoples.php") { echo("active"); }?>">
           <a class="nav-link" href="peoples.php">사람들 <span class="sr-only">(current)</span></a>
         </li>
-
         <?php
         if (assigned()) {
           echo '<li class="nav-item '.($location == "requests.php" ? "active" : "" ).'"><a class="nav-link" href="requests.php">요청 현황</a></li>';
           echo '<li class="nav-item '.($location == "profile.php" ? "active" : "" ).'"><a class="nav-link" href="profile.php">내 프로필</a></li>';
+          echo '<li class="nav-item '.($location == "feedbacks.php" ? "active" : "" ).'"><a class="nav-link" href="feedbacks.php">피드백</a></li>';
         }
         ?>
-
         <li class="nav-item pull-xs-right">
           <?php
             if (!assigned()) {
@@ -24,8 +23,6 @@
                 echo '<a class="nav-link" href="signout.php">로그아웃</a>';
             }
           ?>
-
-
         </li>
       </ul>
     </div>
@@ -38,7 +35,7 @@
 
     <div class=" container ">
       <h4>연세포탈 로그인</h4>
-      <h6 class="text-muted">별도의 회원가입 과정 없이 포탈 로그인으로 안전한 이용이 가능합니다. <a href="#" style="color:grey"><u>추가 정보</u></a></h6>
+      <h6 class="text-muted">별도의 회원가입 과정 없이 포탈 로그인으로 안전한 이용이 가능합니다. <a href="about.php" style="color:grey"><u>추가 정보</u></a></h6>
       <form class="form-inline" action="./signin.php" method="post" style="margin-top: 30px">
         <div class="form-group">
           <input type="number" class="form-control" id="studentId" name="user-id" placeholder="학번" required>
@@ -78,6 +75,8 @@ if (isset($_GET["result"]) && $_GET["result"] != "signin-success" && $_GET["resu
 
   else if ($_GET["result"] == "signup-fail") {
     $message = '계정 생성에 실패하였습니다.';
+  } else {
+    $message = '피드백을 전송하였습니다.';
   }
   echo '<script>showMessage("'.$message.'")</script>';
 }
