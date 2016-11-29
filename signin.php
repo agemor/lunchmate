@@ -50,7 +50,7 @@ else {
     // 계정 생성
     $response = $module->db->in('lunchmate_users')
                            ->insert('student_id', $yonseiAccount["id"])
-                           ->insert('name_korean', base64_encode($yonseiAccount["korean"]))
+                           ->insert('name_korean', $yonseiAccount["korean"])
                            ->insert('name_english', $yonseiAccount["english"])
                            ->insert('phone_number', $yonseiAccount["phone"])
                            ->insert('alarm_settings', "105")

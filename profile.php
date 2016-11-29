@@ -32,7 +32,7 @@ if (isset($_POST["setting-type"])) {
       $success = false;
       $message = "프로필 소개글의 글자 수 제한을 초과하였습니다.";
     } else {
-      $success = tell("UPDATE `lunchmate_users` SET `affiliation`='".base64_encode($affiliation)."', `content`='".base64_encode($content)."' WHERE `student_id`='".getUserId()."';");
+      $success = tell("UPDATE `lunchmate_users` SET `affiliation`='".$affiliation."', `content`='".$content."' WHERE `student_id`='".getUserId()."';");
       if (!$success) {
         $message = "프로필을 업데이트하는데 오류가 발생했습니다.";
       }else {
@@ -95,11 +95,11 @@ $response = askOne("SELECT * FROM `lunchmate_users` WHERE `student_id`='".getUse
 
                 <div class="form-group">
                     <label for="affiliationInput">소속</label>
-                    <input maxlength="30" type="text" class="form-control" id="affiliationInput" name="profile-affiliation" placeholder="학과, 단과대, 동아리, 하우스 등" value=<?php echo('"'.base64_decode($response['affiliation']).'"');?>>
+                    <input maxlength="30" type="text" class="form-control" id="affiliationInput" name="profile-affiliation" placeholder="학과, 단과대, 동아리, 하우스 등" value=<?php echo('"'.$response['affiliation'].'"');?>>
                   </div>
                   <div class="form-group">
                     <label for="profileMessage">소개글</label>
-                    <textarea maxlength="200" class="form-control" rows="14" id="profileMessage" name="profile-content" placeholder="자신에 대해 소개해 주세요. (최대 200자)"><?php echo(base64_decode($response['content']));?></textarea>
+                    <textarea maxlength="200" class="form-control" rows="14" id="profileMessage" name="profile-content" placeholder="자신에 대해 소개해 주세요. (최대 200자)"><?php echo($response['content']);?></textarea>
                     <small class="form-text text-muted">상대방을 불쾌하게 하는 소개글은 차단될 수 있습니다.</small>
 
                   </div>

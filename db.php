@@ -7,6 +7,7 @@ const DB_NAME = "dblunchmate";
 
 // Create connection
 $conn = new mysqli(SERVER_NAME, USER_NAME, USER_PASSWORD, DB_NAME);
+$conn->set_charset("utf8");
 // Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);

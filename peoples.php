@@ -116,10 +116,10 @@ if(assigned()) {
   if(isset($me)) {
       //echo '<div class="col-sm-6 col-md-4 col-lg-3">';
       echo '<div class="card card-outline-secondary card-block ">';
-      echo '<h4 class="card-title"><a class="namecard-title-text" href="#">'.(mb_substr(base64_decode($me["name_korean"]), 1, 10, "utf-8")).'<small>#'.$me["no"].'</small></a></h4>';
-      echo '<h6 class="card-subtitle text-muted">'.base64_decode($me["affiliation"]).'</h6>';
+      echo '<h4 class="card-title"><a class="namecard-title-text" href="#">'.(mb_substr($me["name_korean"], 1, 10, "utf-8")).'<small>#'.$me["no"].'</small></a></h4>';
+      echo '<h6 class="card-subtitle text-muted">'.$me["affiliation"].'</h6>';
       echo '<hr>';
-      echo '<p class="card-text">'.base64_decode($me["content"]).'</p>';
+      echo '<p class="card-text">'.$me["content"].'</p>';
       echo '<button type="button" class="btn btn-sm btn-outline-secondary" id="interestButton" disabled>좋아요 '.$me["interests_received"].'</button>  ';
       echo '<a href="profile.php" class="btn btn-sm btn-outline-secondary ">프로필 수정하기</a>';
       echo '</div>';
@@ -132,16 +132,16 @@ if(assigned()) {
               continue;
           }
       }
-      $userName = (mb_substr(base64_decode($data["name_korean"]), 1, 10, "utf-8"));
+      $userName = (mb_substr($data["name_korean"], 1, 10, "utf-8"));
 
       //echo '<div class="col-sm-6 col-md-4 col-lg-3">';
       echo '<div class="card card-block">';
 
       echo '<h4 class="card-title"><a class="namecard-title-text" href="#">'.$userName.'<small>#'.$data["no"].'</small></a>';
       echo '<a class="pull-xs-right namecard-report-button" href="#"><small>신고</small></a></h4>';
-      echo '<h6 class="card-subtitle text-muted">'.base64_decode($data["affiliation"]).'</h6>';
+      echo '<h6 class="card-subtitle text-muted">'.$data["affiliation"].'</h6>';
       echo '<hr>';
-      echo '<p>'.base64_decode($data["content"]).'</p>';
+      echo '<p>'.$data["content"].'</p>';
 
       
       if (assigned()) {

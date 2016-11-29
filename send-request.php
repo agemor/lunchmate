@@ -72,7 +72,7 @@ if ($_POST["action"] == "request") {
   $response = $module->db->in('lunchmate_requests')
                          ->insert('sender_id', getUserId())
                          ->insert('recipient_id', $recipient["student_id"])
-                         ->insert('message', base64_encode(strip_tags($_POST["message"])))
+                         ->insert('message', strip_tags($_POST["message"]))
                          ->insert('schedule', $_POST["schedule"])
                          ->insert('final_schedule', "")
                          ->insert('status', "0")
@@ -82,7 +82,7 @@ if ($_POST["action"] == "request") {
   // 알림 보내기
   if (intval($recipient["alarm_settings"]) % 7 == 0) {
     $content = "님으로부터 만남 요청이 들어왔습니다. 지금 확인해 보세요!";
-    $name = (mb_substr(base64_decode($sender["name_korean"]), 1, 10, "utf-8"))  . "#" . $sender["no"];
+    $name = (mb_substr($sender["name_korean"], 1, 10, "utf-8"))  . "#" . $sender["no"];
     $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $recipient["phone_number"])]);
   }
 }
@@ -178,12 +178,12 @@ else if ($_POST["action"] == "accept" || $_POST["action"] == "decline") {
 
     // 프로필 알림 설정 보고, sms 전송
     if (intval($sender["alarm_settings"]) % 7 == 0) {
-      $name = (mb_substr(base64_decode($recipient["name_korean"]), 1, 10, "utf-8")) . "#" . $recipient["no"];
+      $name = (mb_substr($recipient["name_korean"], 1, 10, "utf-8")) . "#" . $recipient["no"];
       $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $sender["phone_number"])]);
     }
 
     if (intval($recipient["alarm_settings"]) % 7 == 0) {
-      $name = (mb_substr(base64_decode($sender["name_korean"]), 1, 10, "utf-8"))  . "#" . $sender["no"];
+      $name = (mb_substr($sender["name_korean"], 1, 10, "utf-8"))  . "#" . $sender["no"];
       $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $recipient["phone_number"])]);
     }
   } 
@@ -200,7 +200,7 @@ else if ($_POST["action"] == "accept" || $_POST["action"] == "decline") {
 
     $content = "님이 요청을 거절하셨습니다.";
     if (intval($sender["alarm_settings"]) % 7 == 0) {
-      $name = (mb_substr(base64_decode($recipient["name_korean"]), 1, 10, "utf-8")) . "#" . $recipient["no"];
+      $name = (mb_substr($recipient["name_korean"], 1, 10, "utf-8")) . "#" . $recipient["no"];
       $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $sender["phone_number"])]);
     }
   }
@@ -244,12 +244,12 @@ else if ($_POST["action"] == "cancel") {
   $content = "님과의 약속이 취소되었습니다.";
 
   if (intval($sender["alarm_settings"]) % 7 == 0) {
-    $name = (mb_substr(base64_decode($recipient["name_korean"]), 1, 10, "utf-8")) . "#" . $recipient["no"];
+    $name = (mb_substr($recipient["name_korean"], 1, 10, "utf-8")) . "#" . $recipient["no"];
     $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $sender["phone_number"])]);
   }
 
   if (intval($recipient["alarm_settings"]) % 7 == 0) {
-    $name = (mb_substr(base64_decode($sender["name_korean"]), 1, 10, "utf-8"))  . "#" . $sender["no"];
+    $name = (mb_substr($sender["name_korean"], 1, 10, "utf-8"))  . "#" . $sender["no"];
     $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $recipient["phone_number"])]);
   }
 

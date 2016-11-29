@@ -61,7 +61,7 @@ $requests = $module->db->in("lunchmate_requests")
         echo '<div class="list-group m-b-3">';
 
         if (!$requests){
-          echo '<div class="card"><p class="text-xs-center" style="padding: 40px"><em>아직 주고받은 요청이 없습니다.</em></p></div>';
+          echo '<div class="card card-block"><p class="text-xs-center p-y-2"><em>아직 주고받은 요청이 없습니다</em></p></div>';
         }
 
         foreach ($requests as $request) {
@@ -102,7 +102,7 @@ $requests = $module->db->in("lunchmate_requests")
                              ->select("timestamp")
                              ->where("student_id", "=", $targetUserId)
                              ->goAndGet();
-          $targetUserName = (mb_substr(base64_decode($targetUser["name_korean"]), 1, 10, "utf-8"));
+          $targetUserName = (mb_substr($targetUser["name_korean"], 1, 10, "utf-8"));
 
           
 
@@ -142,11 +142,11 @@ $requests = $module->db->in("lunchmate_requests")
                 data-request-no="' .$request["no"].'"
                 data-location="'   .$request["location"].'"
                 data-status="'     .$request["status"].'"
-                data-message="'    .base64_decode($request["message"]).'"
+                data-message="'    .$request["message"].'"
                 data-mine="'       .($request["sender_id"] == getUserId()).'"
                 data-name="'       .$targetUserName.'"
-                data-affiliation="'.base64_decode($targetUser["affiliation"]).'"
-                data-content="'    .base64_decode($targetUser["content"]).'"
+                data-affiliation="'.$targetUser["affiliation"].'"
+                data-content="'    .$targetUser["content"].'"
                 data-interests="'  .$targetUser["interests_received"].'"
                 data-warnings="'   .$targetUser["warnings_received"].'"
                 data-no="'         .$targetUser["no"].'">';
@@ -179,7 +179,7 @@ $requests = $module->db->in("lunchmate_requests")
           echo '</p>';
 
           // 메시지 보여주기
-          echo '<p class="list-group-item-text">'.base64_decode($request["message"]).'</p>';
+          echo '<p class="list-group-item-text">'.$request["message"].'</p>';
           echo '</a>';
         }
 
@@ -215,7 +215,7 @@ $requests = $module->db->in("lunchmate_requests")
               ?>
             </div>
             <div class="card-block default-card">
-              <p class="text-xs-center p-y-2"> 선택된 요청이 없습니다 </p>
+              <p class="text-xs-center p-y-2"><em>선택된 요청이 없습니다</em></p>
             </div>
           </div>
         </div>

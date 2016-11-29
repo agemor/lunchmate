@@ -25,7 +25,7 @@ $module->{"db"} = new class {
         }
 
         $this->connection = new mysqli(SERVER_NAME, USER_NAME, USER_PASSWORD, DB_NAME);
-
+        $this->connection->set_charset("utf8");
         // 연결 상태 테스트
         if ($this->connection->connect_error){
             $this->recentError = $this->connection->connect_error;

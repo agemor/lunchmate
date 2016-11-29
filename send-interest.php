@@ -120,12 +120,12 @@ if ($interestLog) {
   $content = "님과 서로 관심을 주고받았습니다. 만남 요청을 보내보세요!";
   // 프로필 알림 설정 보고, sms 전송
   if (intval($sender["alarm_settings"]) % 3 == 0) {
-    $name = (mb_substr(base64_decode($recipient["name_korean"]), 1, 10, "utf-8")) . "#" . $recipient["no"];
+    $name = (mb_substr($recipient["name_korean"], 1, 10, "utf-8")) . "#" . $recipient["no"];
     $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $sender["phone_number"])]);
   }
 
   if (intval($recipient["alarm_settings"]) % 3 == 0) {
-    $name = (mb_substr(base64_decode($sender["name_korean"]), 1, 10, "utf-8"))  . "#" . $sender["no"];
+    $name = (mb_substr($sender["name_korean"], 1, 10, "utf-8"))  . "#" . $sender["no"];
     $module->sms->send("[런치메이트] ".$name.$content, [str_replace("-", "", $recipient["phone_number"])]);
   }
 }
