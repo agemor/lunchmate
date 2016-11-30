@@ -42,7 +42,7 @@ if (isset($_POST["feedback"]) && strlen($_POST["feedback"]) > 5) {
       <form method="post">
       <div class="form-group">
         <label for="feedbackTextarea">런치메이트에 대한 피드백을 입력해 주세요. 간단한 의견부터, 에러 제보까지 모두 좋습니다!</label>
-        <textarea class="form-control" name="feedback" id="feedbackTextarea" rows="5"></textarea>
+        <textarea class="form-control md-textarea" name="feedback" id="feedbackTextarea" rows="5"></textarea>
       </div>
       <button type="submit" class="btn btn-primary">제출하기</button>
       </form>

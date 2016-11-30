@@ -109,13 +109,12 @@ $response = $module->db->in("lunchmate_users")
 
                 <div class="form-group">
                     <label for="affiliationInput">소속</label>
-                    <input maxlength="30" type="text" class="form-control" id="affiliationInput" name="profile-affiliation" placeholder="학과, 단과대, 동아리, 하우스 등" value=<?php echo('"'.$response['affiliation'].'"');?>>
+                    <input maxlength="30" type="text" class="form-control md-textarea" id="affiliationInput" name="profile-affiliation" placeholder="학과, 단과대, 동아리, 하우스 등" value=<?php echo('"'.$response['affiliation'].'"');?>>
                   </div>
-                  <div class="form-group">
+                  <div class="form-group m-t-3">
                     <label for="profileMessage">소개글</label>
-                    <textarea maxlength="200" class="form-control" rows="14" id="profileMessage" name="profile-content" placeholder="자신에 대해 소개해 주세요. (최대 200자) 예시: 연세독수리 한화이글스~ 안녕하세요! 한화팬분들 없으신가요? 같은 연세대 한화팬으로서 같이 톡도 파서 팀 얘기도 하고, 시즌이 되면 같이 직관도 보러가면 어떨까요? 밤에 같이 치킨먹으면서 야구얘기해도 재밌을것 같아요! 한화라서 행복합니다."><?php echo($response['content']);?></textarea>
+                    <textarea maxlength="200" class="form-control md-textarea" rows="14" id="profileMessage" name="profile-content" length="200" placeholder="자신에 대해 소개해 주세요. (최대 200자)"><?php echo($response['content']);?></textarea>
                     <small class="form-text text-muted">상대방을 불쾌하게 하는 소개글은 차단될 수 있습니다.</small>
-
                   </div>
                   <div class="row">
                     <div class="col-xs-6">
@@ -184,7 +183,7 @@ $response = $module->db->in("lunchmate_users")
                   <span class="custom-control-indicator"></span>
                   <span class="custom-control-description">스케줄 확인 알림</span>
                   </label>
-                  <button type="button" class="btn btn-secondary pull-xs-right" disabled>모든 정보 삭제하기 (탈퇴)</button>
+                  <button type="button" class="btn btn-danger pull-xs-right" disabled>모든 정보 삭제하기 (탈퇴)</button>
                 </form>
               </div>
             </div>

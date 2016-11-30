@@ -1,26 +1,30 @@
-<nav class="navbar navbar-light bg-faded">
+<nav class="navbar navbar-dark primary-color-dark">
   <button class="navbar-toggler hidden-sm-up" type="button" data-toggle="collapse" data-target="#navigationBar" aria-controls="navigationBar" aria-expanded="false" aria-label="Toggle navigation">
   &#9776;
   </button>
+      <div class="container">
+
+
   <div class="collapse navbar-toggleable-xs" id="navigationBar">
-    <div class="container">
+                        <a class="navbar-brand" href="/"><strong>런치메이트</strong></a>
+
       <ul class="nav navbar-nav">
         <li class="nav-item <?php if($location == "peoples.php") { echo("active"); }?>">
-          <a class="nav-link" href="peoples.php">사람들 <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="peoples.php"><i class="fa fa-address-book-o" aria-hidden="true"></i> 사람들 <span class="sr-only">(current)</span></a>
         </li>
         <?php
         if (assigned()) {
-          echo '<li class="nav-item '.($location == "requests.php" ? "active" : "" ).'"><a class="nav-link" href="requests.php">요청 현황</a></li>';
-          echo '<li class="nav-item '.($location == "profile.php" ? "active" : "" ).'"><a class="nav-link" href="profile.php">내 프로필</a></li>';
-          echo '<li class="nav-item '.($location == "feedbacks.php" ? "active" : "" ).'"><a class="nav-link" href="feedbacks.php">피드백</a></li>';
+          echo '<li class="nav-item '.($location == "requests.php" ? "active" : "" ).'"><a class="nav-link" href="requests.php"><i class="fa fa-handshake-o" aria-hidden="true"></i> 요청 현황</a></li>';
+          echo '<li class="nav-item '.($location == "profile.php" ? "active" : "" ).'"><a class="nav-link" href="profile.php"><i class="fa fa-user-o" aria-hidden="true"></i> 내 프로필</a></li>';
+          echo '<li class="nav-item '.($location == "feedbacks.php" ? "active" : "" ).'"><a class="nav-link" href="feedbacks.php"><i class="fa fa-comment-o" aria-hidden="true"></i> 피드백</a></li>';
         }
         ?>
         <li class="nav-item pull-xs-right">
           <?php
             if (!assigned()) {
-                echo '<a class="nav-link" href="#" data-toggle="collapse" data-target="#loginCollapsePanel" aria-controls="loginCollapsePanel" aria-expanded="false" aria-label="Toggle navigation" id="loginToggleButton">로그인</a>';
+                echo '<a class="nav-link" href="#" data-toggle="collapse" data-target="#loginCollapsePanel" aria-controls="loginCollapsePanel" aria-expanded="false" aria-label="Toggle navigation" id="loginToggleButton"><i class="fa fa-sign-in" aria-hidden="true"></i> 로그인</a>';
             } else {
-                echo '<a class="nav-link" href="signout.php">로그아웃</a>';
+                echo '<a class="nav-link" href="signout.php"><i class="fa fa-sign-out" aria-hidden="true"></i> 로그아웃</a>';
             }
           ?>
         </li>
@@ -43,7 +47,7 @@
         <div class="form-group">
           <input type="password" class="form-control" id="studentPassword" name="user-password" placeholder="비밀번호" required>
         </div>
-        <button type="submit" class="btn btn-secondary">로그인</button>
+        <button type="submit" class="btn btn-lg btn-primary">로그인</button>
       </form>
 
     </div>

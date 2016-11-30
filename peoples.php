@@ -88,21 +88,31 @@ if(assigned()) {
 </style>
 
 <div class="container">
-<form action="./peoples.php" method="get">
-  <div class="input-group input-group-lg m-y-2">
-    <input type="text" class="form-control" name="keyword" placeholder="검색 키워드" value="<?php echo $_GET["keyword"];?>">
-    <span class="input-group-btn">
-        <button type="submit" class="btn btn-secondary" type="button">찾기</button>
-    </span>
-  </div>
-</form>
 
-<div class="alert alert-info alert-dismissible fade in" role="alert">
-  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span>
-  </button>
-  <strong>검색하지 않을 경우 무작위로 20명의 정보가 보여집니다.</strong> 새로고침하면 다시 불러옵니다.
+<div class="card m-y-2"><div class="card-block">
+<h4 class="card-title">런치메이트에 처음이신가요?</h4>
+
+<a type="button" class="btn btn-lg btn-primary" href="./about.php">사용설명서 읽기</a>
+
+</div></div>
+
+
+<div class="card "><div class="card-block">
+<h4 class="card-title">검색 상자</h4>
+<form action="./peoples.php" method="get">
+<div class="md-form input-group m-y-0">
+    <input type="text" class="form-control" name="keyword" placeholder="이름, 소속, 자기소개" value="<?php echo (isset($_GET["keyword"]) ? $_GET["keyword"] : "");?>">
+    <span class="input-group-btn">
+        <button type="submit" class="btn btn-primary btn-lg" type="button"><i class="fa fa-search"></i></button>
+    </span>
 </div>
+</form>
+</div></div>
+
+<p style="margin-top: 4em; margin-bottom: 4em;" class="text-xs-center text-muted">  검색하지 않을 경우 무작위로 20명의 정보가 보여집니다. <strong>새로 보시려면 새로고침하세요.</strong> 
+ </p>
+
+
 <style type="text/css">
 
 @media (min-width: 20em) {
@@ -136,7 +146,6 @@ if(assigned()) {
 
 
 </style>
-
 <?php include "request-modal.php";?>
 
 
@@ -147,13 +156,13 @@ if(assigned()) {
   // self page
   if(isset($me)) {
       //echo '<div class="col-sm-6 col-md-4 col-lg-3">';
-      echo '<div class="card card-outline-secondary card-block ">';
-      echo '<h4 class="card-title"><a class="namecard-title-text" href="#">'.(mb_substr($me["name_korean"], 1, 10, "utf-8")).'<small>#'.$me["no"].'</small></a></h4>';
-      echo '<h6 class="card-subtitle text-muted">'.$me["affiliation"].'</h6>';
+      echo '<div class="card card-outline-secondary card-block m-t-1">';
+      echo '<h4 class="card-title"><span class="namecard-title-text">'.(mb_substr($me["name_korean"], 1, 10, "utf-8")).'<small>#'.$me["no"].'</small></span></h4>';
+      echo '<h6 class="card-subtitle text-muted m-t-1">'.$me["affiliation"].'</h6>';
       echo '<hr>';
       echo '<p class="card-text">'.$me["content"].'</p>';
-      echo '<button type="button" class="btn btn-sm btn-outline-secondary" id="interestButton" disabled>좋아요 '.$me["interests_received"].'</button>  ';
-      echo '<a href="profile.php" class="btn btn-sm btn-outline-secondary ">프로필 수정하기</a>';
+      echo '<button type="button" class="btn btn-sm btn-info p-x-1" id="interestButton" disabled><i class="fa fa-star-o"></i>&nbsp;&nbsp;'.$me["interests_received"].'</button>  ';
+      echo '<a href="profile.php" class="btn btn-sm btn-primary p-x-1">프로필 수정하기</a>';
       echo '</div>';
       //echo '</div>';
   }
@@ -167,13 +176,13 @@ if(assigned()) {
       $userName = (mb_substr($data["name_korean"], 1, 10, "utf-8"));
 
       //echo '<div class="col-sm-6 col-md-4 col-lg-3">';
-      echo '<div class="card card-block">';
+      echo '<div class="card m-y-1"><div class="card-block">';
 
-      echo '<h4 class="card-title"><a class="namecard-title-text" href="#">'.$userName.'<small>#'.$data["no"].'</small></a>';
+      echo '<h4 class="card-title"><span class="namecard-title-text">'.$userName.'<small>#'.$data["no"].'</small></span>';
       echo '<a class="pull-xs-right namecard-report-button" href="#"><small>신고</small></a></h4>';
-      echo '<h6 class="card-subtitle text-muted">'.$data["affiliation"].'</h6>';
+      echo '<h6 class="card-subtitle text-muted  m-t-1">'.$data["affiliation"].'</h6>';
       echo '<hr>';
-      echo '<p>'.$data["content"].'</p>';
+      echo '<p class="card-text">'.$data["content"].'</p>';
 
 
       if (assigned()) {
@@ -185,12 +194,12 @@ if(assigned()) {
               break;
             }
         }
-        echo '<button type="button" class="btn btn-sm '.($interested ? "btn-primary" : "btn-outline-secondary").' interest-button" data-no="'.$data["no"].'">좋아요 '.$data["interests_received"].'</button>  ';
-        echo '<button type="button" class="btn btn-sm btn-outline-info request-button" data-toggle="modal" data-target="#requestModal" data-name="'.$userName.'" data-no="'.$data["no"].'">안녕하세요</button>';
+        echo '<button type="button" class="btn btn-sm interest-button p-x-1 '.($interested ? "btn-indigo" : "btn-info").'" data-no="'.$data["no"].'"><i class="fa fa-star-o"></i>&nbsp;&nbsp;<span class="interest-text">'.$data["interests_received"].'</span></button>  ';
+        echo '<button type="button" class="btn btn-sm btn-primary request-button p-x-1" data-toggle="modal" data-target="#requestModal" data-name="'.$userName.'" data-no="'.$data["no"].'">만나요!</button>';
       } else {
-        echo '<button type="button" class="btn btn-sm btn-outline-secondary" disabled>좋아요 '.$data["interests_received"].'</button>  ';
+        echo '<button type="button" class="btn btn-sm btn-info" disabled><i class="fa fa-star-o"></i>&nbsp;&nbsp;'.$data["interests_received"].'</button>  ';
       }
-      echo '</div>';
+      echo '</div></div>';
   }
 
   echo '</div>';
@@ -233,7 +242,10 @@ if(assigned()) {
   });
 
   $(".interest-button").click(function(event) {
-    $(this).text("처리 중...");
+    $(this).prop('disabled', true);
+    $(this).find(".interest-text").text("처리중...");
+    //$("input").
+
     sendInterest($(this).data("no"), this);
   });
 
@@ -294,8 +306,10 @@ if(assigned()) {
     httpRequest.addEventListener('load', function(event) {
       var result = JSON.parse(httpRequest.responseText);
       if (result.response) {
-        $(buttonRef).text("좋아요 " +result.interests);
-        $(buttonRef).toggleClass("btn-primary btn-outline-secondary");
+        $(buttonRef).prop('disabled', false);
+        $(buttonRef).find(".interest-text").text(result.interests);
+        //$(buttonRef).text(result.interests);
+        $(buttonRef).toggleClass("btn-info btn-indigo");
       } else {
         $(buttonRef).text("처리 실패");
       }

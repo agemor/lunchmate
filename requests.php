@@ -197,7 +197,7 @@ $requests = $module->db->in("lunchmate_requests")
 
               <strong><p class="request-location-text">시간과 장소는 문자메시지를 참조해 주세요.</p></strong>
 
-              <button type="button" class="btn btn-secondary" data-toggle="collapse" href="#namecard" aria-expanded="false" aria-controls="namecard">소개 보기</button>
+              <button type="button" class="btn btn-info" data-toggle="collapse" href="#namecard" aria-expanded="false" aria-controls="namecard">소개 보기</button>
               <button type="button" class="btn btn-primary request-accept-button">수락하기</button>
               <button type="button" class="btn btn-danger request-decline-button">거절하기</button>
               <button type="button" class="btn btn-danger request-cancel-button">취소하기</button>

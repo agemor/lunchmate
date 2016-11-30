@@ -10,8 +10,8 @@
       </div>
       <div class="modal-body">
         <h6>메시지</h6>
-        <div class="form-group">
-          <textarea class="form-control" rows="4" id="requestModalMessageInput" placeholder="간단한 인사말을 남겨 보세요." required></textarea>
+        <div class="md-form form-group">
+          <textarea class="form-control md-textarea" rows="4" id="requestModalMessageInput" placeholder="간단한 인사말을 남겨 보세요." required></textarea>
         </div>
         <br/>
         <h6>가능한 스케줄</h6>
@@ -29,7 +29,7 @@
         </script>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary request-cancel-button" data-dismiss="modal">취소하기</button>
+        <button type="button" class="btn btn-danger request-cancel-button" data-dismiss="modal">취소하기</button>
         <button type="button" class="btn btn-primary request-send-button">요청 보내기</button>
       </div>
     </div>
