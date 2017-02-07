@@ -33,11 +33,11 @@ $module->{"sms"} = new class {
 
         $session = curl_init();
         curl_setopt_array($session, $options);
-
         $result = curl_exec($session);
-        curl_close($session);
 
-        return $result;
+        curl_close($result);
+
+        return $error;
     }
 }
 ?>

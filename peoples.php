@@ -5,6 +5,7 @@ include "module.sms.php";
 
 $location = "peoples.php";
 
+
 // 키워드가 있으면
 function fetchAll() {
   global $module;
@@ -216,6 +217,7 @@ if(assigned()) {
   ?>
 
   $(".request-button").click(function(event) {
+    //$('#requestModal').modal('show');
     setRequestModal($(this).data("name"), $(this).data("no"));
   });
 
@@ -269,6 +271,7 @@ if(assigned()) {
             $(this).removeClass("bg-primary");
          })
     });
+
   }
 
   function sendRequest(targetNo, message, schedule) {
